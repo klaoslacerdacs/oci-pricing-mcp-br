@@ -44,6 +44,7 @@ import { listDatabaseOptions, calculateDatabaseCost, compareDatabaseOptions } fr
 import { listNetworkingOptions, calculateNetworkingCost, compareDataEgress } from './tools/networking.js';
 import { listKubernetesOptions, calculateKubernetesCost, compareKubernetesProviders } from './tools/kubernetes.js';
 import { listMulticloudDatabases, getMulticloudAvailabilityMatrix, calculateMulticloudDatabaseCost, compareMulticloudVsOCI } from './tools/multicloud.js';
+import { getCloudInstancePrice, compareVmOciVsCloud } from './tools/vantage.js';
 import {
   listAIMLServices,
   listObservabilityServices,
@@ -810,6 +811,35 @@ const TOOLS = [
       properties: {},
     },
   },
+  // Multicloud compute (live AWS/Azure/GCP via Vantage instances MCP)
+  {
+    name: 'get_cloud_instance_price',
+    description: 'Live On-Demand price + specs for an AWS/Azure/GCP compute instance type, by region (source: instances.vantage.sh).',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        provider: { type: 'string', enum: ['aws', 'azure', 'gcp'] },
+        instanceType: { type: 'string', description: 'e.g. t3.medium (aws), Standard_D2s_v5 (azure), e2-medium (gcp)' },
+        region: { type: 'string', description: 'Provider region code; defaults us-east-1 / eastus / us-central1' },
+        os: { type: 'string', description: 'OS row to price (default Linux)' },
+      },
+      required: ['provider', 'instanceType'],
+    },
+  },
+  {
+    name: 'compare_vm_oci_vs_cloud',
+    description: 'Compare a real AWS/Azure/GCP VM against the equivalent OCI E5 shape, with OCPU<->vCPU de-para (1 OCPU = 2 vCPU).',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        provider: { type: 'string', enum: ['aws', 'azure', 'gcp'] },
+        instanceType: { type: 'string', description: 'Cloud instance type to price and match against OCI' },
+        region: { type: 'string', description: 'Provider region code (default per provider)' },
+        os: { type: 'string', description: 'OS row to price (default Linux)' },
+      },
+      required: ['provider', 'instanceType'],
+    },
+  },
 ];
 
 // Tools that reach out to Oracle's live pricing API. Everything else reads
@@ -1031,6 +1061,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         break;
       case 'get_services_summary':
         result = getServicesSummary();
+        break;
+
+      // Multicloud compute (Vantage)
+      case 'get_cloud_instance_price':
+        result = await getCloudInstancePrice(typedArgs);
+        break;
+      case 'compare_vm_oci_vs_cloud':
+        result = await compareVmOciVsCloud(typedArgs);
         break;
 
       default:

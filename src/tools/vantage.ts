@@ -1,0 +1,166 @@
+/**
+ * Multicloud compute pricing via the public Vantage instances MCP
+ * (instances.vantage.sh — ex ec2instances.info). Live AWS/Azure/GCP instance
+ * pricing on demand, plus the OCPU<->vCPU de-para against OCI E5 compute.
+ *
+ * Why proxy the Vantage MCP instead of the raw dataset: the open JSON dumps are
+ * huge (EC2 ~316MB), unusable at runtime. The MCP answers per-instance with a
+ * few KB. Endpoint URL is overridable via VANTAGE_MCP_URL.
+ */
+
+import { pricingCache } from '../data/cache.js';
+import { calculateMonthlyCost } from './calculator.js';
+
+const VANTAGE_URL =
+  process.env.VANTAGE_MCP_URL ||
+  'https://instances-mcp.vantage.sh/mcp/7df14383-f859-48e5-9e51-c7f169b2fed0';
+
+const HOURS_PER_MONTH = 730;
+
+type Provider = 'aws' | 'azure' | 'gcp';
+
+interface ProviderCfg {
+  detailTool: string;
+  regionTool: string;
+  defaultRegion: string;
+  label: string;
+}
+
+const PROVIDERS: Record<Provider, ProviderCfg> = {
+  aws: { detailTool: 'get-ec2-instance', regionTool: 'get-ec2-region-pricing', defaultRegion: 'us-east-1', label: 'AWS EC2' },
+  azure: { detailTool: 'get-azure-instance', regionTool: 'get-azure-region-pricing', defaultRegion: 'eastus', label: 'Azure' },
+  gcp: { detailTool: 'get-gcp-instance', regionTool: 'get-gcp-region-pricing', defaultRegion: 'us-central1', label: 'GCP' },
+};
+
+/** Call the Vantage MCP (JSON-RPC over streamable HTTP) and return the text payload. Cached. */
+async function callVantage(tool: string, args: Record<string, string>): Promise<string> {
+  const cacheKey = `vantage_${tool}_${Object.values(args).join('_')}`;
+  const cached = pricingCache.get<string>(cacheKey);
+  if (cached) return cached;
+
+  const res = await fetch(VANTAGE_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
+    body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name: tool, arguments: args } }),
+  });
+  if (!res.ok) throw new Error(`Vantage MCP HTTP ${res.status}`);
+
+  // Response is SSE: one or more `data: {json}` lines. Take the one carrying the JSON-RPC envelope.
+  const body = await res.text();
+  const line = body.split('\n').reverse().find((l) => l.startsWith('data:') && l.includes('"jsonrpc"'));
+  if (!line) throw new Error('Vantage MCP: no data frame in response');
+  const env = JSON.parse(line.slice(line.indexOf(':') + 1).trim()) as {
+    error?: { message: string };
+    result?: { content: Array<{ text: string }> };
+  };
+  if (env.error) throw new Error(`Vantage MCP: ${env.error.message}`);
+  const text = env.result?.content?.[0]?.text;
+  if (!text) throw new Error('Vantage MCP: empty result');
+
+  pricingCache.set(cacheKey, text, 720); // 12h — instance pricing barely moves
+  return text;
+}
+
+/** First `$X/hr` on the row for the given OS in a region-pricing markdown table. */
+export function parseOnDemandHourly(md: string, os: string): number {
+  const row = md.split('\n').find((l) => new RegExp(`\\|\\s*${os}\\s*\\|`, 'i').test(l));
+  const m = row?.match(/\$([0-9.]+)\s*\/\s*hr/i);
+  if (!m) throw new Error(`On-Demand price not found for OS "${os}"`);
+  return parseFloat(m[1]);
+}
+
+export function parseSpec(md: string, label: RegExp): number | undefined {
+  const m = md.match(label);
+  return m ? parseFloat(m[1]) : undefined;
+}
+
+export interface CloudInstancePriceParams {
+  provider: Provider;
+  instanceType: string;
+  region?: string;
+  os?: string;
+}
+
+/** Raw live price + specs for one cloud instance type. */
+export async function getCloudInstancePrice(params: CloudInstancePriceParams) {
+  const cfg = PROVIDERS[params.provider];
+  if (!cfg) throw new Error(`Unknown provider: ${params.provider}`);
+  const region = params.region || cfg.defaultRegion;
+  const os = params.os || 'Linux';
+
+  const [detail, pricing] = await Promise.all([
+    callVantage(cfg.detailTool, { instanceType: params.instanceType }),
+    callVantage(cfg.regionTool, { instanceType: params.instanceType, region }),
+  ]);
+
+  const vcpu = parseSpec(detail, /vCPUs:\s*([0-9.]+)/i);
+  const memoryGB = parseSpec(detail, /Memory \(GiB\):\s*([0-9.]+)/i);
+  const hourly = parseOnDemandHourly(pricing, os);
+
+  return {
+    provider: cfg.label,
+    instanceType: params.instanceType,
+    region,
+    os,
+    vcpu,
+    memoryGB,
+    onDemandHourly: hourly,
+    monthlyOnDemand: Math.round(hourly * HOURS_PER_MONTH * 100) / 100,
+    source: 'instances.vantage.sh (live)',
+  };
+}
+
+export interface CompareVmParams extends CloudInstancePriceParams {}
+
+/**
+ * Compare a real cloud VM against the equivalent OCI E5 shape.
+ * De-para: OCI sells OCPUs (1 OCPU = 1 physical core = 2 vCPUs); the other clouds
+ * sell vCPUs (threads). So N vCPU -> N/2 OCPU on OCI, same RAM.
+ */
+export async function compareVmOciVsCloud(params: CompareVmParams) {
+  const cloud = await getCloudInstancePrice(params);
+
+  if (cloud.vcpu === undefined || cloud.memoryGB === undefined) {
+    return { error: 'Could not read vCPU/memory from Vantage; cannot size OCI equivalent', cloud };
+  }
+
+  // ponytail: E5.Flex is whole-OCPU; round up odd vCPU counts. Fractional OCPU not offered.
+  const ocpus = Math.max(1, Math.round(cloud.vcpu / 2));
+  const oci = calculateMonthlyCost({ compute: { shape: 'VM.Standard.E5.Flex', ocpus, memoryGB: cloud.memoryGB } });
+
+  const ociMonthly = oci.totalMonthly;
+  const diff = Math.round((cloud.monthlyOnDemand - ociMonthly) * 100) / 100;
+  const pct = ociMonthly > 0 ? Math.round((diff / ociMonthly) * 100) : 0;
+
+  return {
+    config: { vcpu: cloud.vcpu, memoryGB: cloud.memoryGB },
+    cloud: {
+      provider: cloud.provider,
+      instanceType: cloud.instanceType,
+      region: cloud.region,
+      monthlyOnDemand: cloud.monthlyOnDemand,
+      hourly: cloud.onDemandHourly,
+    },
+    oci: {
+      shape: 'VM.Standard.E5.Flex',
+      ocpus,
+      memoryGB: cloud.memoryGB,
+      region: 'any commercial (flat pricing)',
+      monthly: ociMonthly,
+      breakdown: oci.breakdown,
+    },
+    depara: `${cloud.vcpu} vCPU = ${ocpus} OCPU (1 OCPU = 2 vCPU); RAM 1:1`,
+    verdict:
+      diff > 0
+        ? `OCI is $${Math.abs(diff)}/mo cheaper (${Math.abs(pct)}%)`
+        : diff < 0
+          ? `${cloud.provider} is $${Math.abs(diff)}/mo cheaper (${Math.abs(pct)}%)`
+          : 'Same price',
+    currency: 'USD',
+    notes: [
+      'Cloud price = On-Demand Linux; add Savings Plans/Reserved for committed discounts.',
+      'OCI E5 has flat global pricing; the other clouds vary by region (esp. sa-east-1 premium).',
+      'Storage and egress not included — use calculate_storage_cost / compare_data_egress.',
+    ],
+  };
+}
