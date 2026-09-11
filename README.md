@@ -208,9 +208,9 @@ Puts OCI side by side with AWS/Azure/GCP for one service category, pulling each 
 
 | Tool | Description |
 |------|-------------|
-| `compare_service` | `category` ∈ `object-storage`, `serverless`, `database-postgres`, `kubernetes`, `data-warehouse`. `region` preset `us`\|`br` (mapped per cloud). `sizing` per category. Returns each cloud's real priced components + a `monthlyEstimate` where units align, and a `cheapest`. |
+| `compare_service` | `category` ∈ `object-storage`, `serverless`, `database-postgres`, `kubernetes`, `data-warehouse`, `cache-redis`, `load-balancer`. `region` preset `us`\|`br`\|`eu` (mapped per cloud). `sizing` per category. Returns each cloud's real priced components + a `monthlyEstimate` where units align, and a `cheapest`. |
 
-Honest by design: it never forces a single number where units differ. `data-warehouse` returns `comparable:false` (OCI ADW $/ECPU-hr vs Redshift $/node-hr vs BigQuery $/TiB-scanned vs Synapse DWU-hr) — components only. `sizing` keys: storage `{storageGB,tier}`; serverless `{monthlyInvocations,avgDurationMs,memoryMB}`; database-postgres/data-warehouse `{ocpus,memoryGB,storageGB,awsRdsInstanceType}`; kubernetes `{nodeCount,vcpu,memoryGB,awsNodeType,azureNodeType,gcpNodeType}`.
+Honest by design: it never forces a single number where units differ. `data-warehouse` returns `comparable:false` (OCI ADW $/ECPU-hr vs Redshift $/node-hr vs BigQuery $/TiB-scanned vs Synapse DWU-hr) — components only. `sizing` keys: storage `{storageGB,tier}`; serverless `{monthlyInvocations,avgDurationMs,memoryMB}`; database-postgres/data-warehouse `{ocpus,memoryGB,storageGB,awsRdsInstanceType}`; kubernetes `{nodeCount,vcpu,memoryGB,awsNodeType,azureNodeType,gcpNodeType}`; cache-redis `{memoryGB,awsCacheNodeType}`; load-balancer `{bandwidthMbps}`. For `cache-redis` OCI/GCP bill per GB-memory while AWS/Azure price per instance tier (default/cheapest — not identical sizing); for `load-balancer` only OCI includes bandwidth in the base (AWS LCU / Azure rules / GCP data-processing excluded).
 
 Example — `compare_service({ category: "object-storage", region: "br", sizing: { storageGB: 1000 } })` → OCI **$25.50** vs S3 $40.50 vs Blob $48.90 vs GCS $35.00/mo (cheapest: OCI). Cross-cloud sizing uses 1 OCPU = 2 vCPU; compute-only for Azure/GCP DB (add storage/HA), on-demand nodes for K8s.
 

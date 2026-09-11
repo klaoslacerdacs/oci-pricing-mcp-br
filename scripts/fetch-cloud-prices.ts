@@ -35,8 +35,10 @@ const AWS_CONFIG: Array<{ code: string; name: string }> = [
   { code: 'AmazonEKS', name: 'EKS' },
   { code: 'AmazonDynamoDB', name: 'DynamoDB' },
   { code: 'AmazonRedshift', name: 'Redshift' },
+  { code: 'AmazonElastiCache', name: 'ElastiCache' },
+  { code: 'AWSELB', name: 'ELB' },
 ];
-const AWS_REGIONS = ['us-east-1', 'sa-east-1'];
+const AWS_REGIONS = ['us-east-1', 'sa-east-1', 'eu-west-1'];
 
 interface AwsOffer {
   products: Record<string, { productFamily?: string; attributes?: Record<string, string> }>;

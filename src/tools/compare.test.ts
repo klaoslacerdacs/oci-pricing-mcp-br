@@ -37,6 +37,21 @@ describe('compareService', () => {
     expect(oci.monthlyEstimate).toBeCloseTo(inv * invRate + gbSec * exRate, 4);
   }, T);
 
+  it('cache-redis: OCI monthly = rate × GB × 730', async () => {
+    const gb = 16;
+    const r = (await compareService({ category: 'cache-redis', sizing: { memoryGB: gb } })) as { comparison: Array<{ cloud: string; components: Array<{ price: number }>; monthlyEstimate: number | null }> };
+    const oci = r.comparison.find((c) => c.cloud === 'OCI')!;
+    expect(oci.monthlyEstimate).toBeCloseTo(oci.components[0].price * gb * 730, 2);
+  }, T);
+
+  it('load-balancer: OCI monthly = (inst + bw×Mbps) × 730', async () => {
+    const mbps = 100;
+    const r = (await compareService({ category: 'load-balancer', sizing: { bandwidthMbps: mbps } })) as { comparison: Array<{ cloud: string; components: Array<{ price: number }>; monthlyEstimate: number | null }> };
+    const oci = r.comparison.find((c) => c.cloud === 'OCI')!;
+    const [inst, bw] = oci.components;
+    expect(oci.monthlyEstimate).toBeCloseTo((inst.price + bw.price * mbps) * 730, 2);
+  }, T);
+
   it('data-warehouse is components-only (comparable:false)', async () => {
     const r = (await compareService({ category: 'data-warehouse', sizing: { ocpus: 2, storageGB: 1024 } })) as { comparable: boolean; cheapest: string | null };
     expect(r.comparable).toBe(false);

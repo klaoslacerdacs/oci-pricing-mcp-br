@@ -15,7 +15,7 @@
 import { calculateStorageCost } from './storage.js';
 import { calculateDatabaseCost } from './database.js';
 import { calculateKubernetesCost } from './kubernetes.js';
-import { getServerlessPricing } from '../data/fetcher.js';
+import { getServerlessPricing, getCachePricing, getNetworkingPricing } from '../data/fetcher.js';
 import { getServicePrice } from './bundled.js';
 import { getAzurePrice } from './cloudprice.js';
 import { getGcpPrice } from './gcpprice.js';
@@ -23,12 +23,13 @@ import { getCloudInstancePrice } from './vantage.js';
 
 const HOURS = 730;
 
-const REGIONS: Record<'us' | 'br', { aws: string; azure: string; gcp: string }> = {
+const REGIONS: Record<'us' | 'br' | 'eu', { aws: string; azure: string; gcp: string }> = {
   us: { aws: 'us-east-1', azure: 'eastus', gcp: 'us-central1' },
   br: { aws: 'sa-east-1', azure: 'brazilsouth', gcp: 'southamerica-east1' },
+  eu: { aws: 'eu-west-1', azure: 'westeurope', gcp: 'europe-west1' },
 };
 
-type Category = 'object-storage' | 'serverless' | 'database-postgres' | 'kubernetes' | 'data-warehouse';
+type Category = 'object-storage' | 'serverless' | 'database-postgres' | 'kubernetes' | 'data-warehouse' | 'cache-redis' | 'load-balancer';
 
 interface Component { item: string; price: number; unit: string }
 interface CloudResult {
@@ -282,12 +283,93 @@ async function dataWarehouse(region: keyof typeof REGIONS, sizing: Sizing): Prom
   };
 }
 
+async function cacheRedis(region: keyof typeof REGIONS, sizing: Sizing): Promise<{ comparable: boolean; comparison: CloudResult[]; caveats: string[] }> {
+  const memoryGB = Number(sizing.memoryGB ?? 16);
+  const R = REGIONS[region];
+
+  const oci = await safe('OCI', 'Cache with Redis', 'OCI (bundled)', async () => {
+    const rows = getCachePricing();
+    const tier = memoryGB <= 10 ? 'low' : 'high';
+    const rate = rows.find((r) => r.memoryTier === tier)?.pricePerUnit;
+    if (rate == null) throw new Error('OCI Redis rate not found');
+    return { components: [{ item: `Redis (${tier} tier)`, price: rate, unit: 'GB-memory-hr' }], monthlyEstimate: round(rate * memoryGB * HOURS), note: `${memoryGB} GB × $${rate}/GB-hr` };
+  });
+  const aws = await safe('AWS', 'ElastiCache', 'AWS Price List', async () => {
+    const node = String(sizing.awsCacheNodeType || 'cache.m5.large');
+    const row = awsRows('ElastiCache', node, R.aws).find((x) => /Hrs|Hour/i.test(x.unit) && x.usd > 0);
+    if (!row) throw new Error(`ElastiCache ${node} rate not found — pass awsCacheNodeType`);
+    return { components: [{ item: node, price: row.usd, unit: 'hour' }], monthlyEstimate: round(row.usd * HOURS), note: `node ${node} (per-instance, not per-GB)` };
+  });
+  const azure = await safe('Azure', 'Cache for Redis', 'prices.azure.com', async () => {
+    const rows = (await azureRows('Redis', R.azure)).filter((x) => /Hour/i.test(x.unit) && x.price > 0 && /Cache|Redis/i.test(x.product)).sort((a, b) => a.price - b.price);
+    if (!rows.length) throw new Error('Azure Cache for Redis rate not found');
+    return { components: [{ item: rows[0].meter, price: rows[0].price, unit: 'hour' }], monthlyEstimate: round(rows[0].price * HOURS), note: `entry tier "${rows[0].meter}" (fixed size, may be far smaller than ${memoryGB} GB — per-instance, not per-GB)` };
+  });
+  const gcp = await safe('GCP', 'Memorystore for Redis', 'Cloud Billing Catalog', async () => {
+    const rows = (await gcpRows('Cloud Memorystore for Redis', 'Capacity', R.gcp)).filter((x) => x.usd != null && x.usd > 0 && /gib|gb/i.test(x.unit || ''));
+    if (!rows.length) throw new Error('Memorystore Redis rate not found');
+    const per = rows.sort((a, b) => a.usd! - b.usd!)[0];
+    return { components: [{ item: per.description.slice(0, 45), price: per.usd!, unit: per.unit || 'GiB-hr' }], monthlyEstimate: round(per.usd! * memoryGB * HOURS), note: `${memoryGB} GB (per-GB)` };
+  });
+
+  return {
+    comparable: true,
+    comparison: [oci, aws, azure, gcp],
+    caveats: [
+      `${memoryGB} GB Redis. OCI/GCP bill per GB-memory; AWS/Azure per instance tier (default cache.m5.large / cheapest) — not identical sizing.`,
+      'Excludes HA replicas, data transfer, and provisioned throughput.',
+    ],
+  };
+}
+
+async function loadBalancer(region: keyof typeof REGIONS, sizing: Sizing): Promise<{ comparable: boolean; comparison: CloudResult[]; caveats: string[] }> {
+  const mbps = Number(sizing.bandwidthMbps ?? 100);
+  const R = REGIONS[region];
+
+  const oci = await safe('OCI', 'Flexible Load Balancer', 'OCI (bundled)', async () => {
+    const net = getNetworkingPricing();
+    const inst = net.find((n) => n.type === 'flexible-load-balancer')?.pricePerUnit;
+    const bw = net.find((n) => n.type === 'flexible-load-balancer-bandwidth')?.pricePerUnit;
+    if (inst == null || bw == null) throw new Error('OCI Load Balancer rates not found');
+    return { components: [{ item: 'LB instance', price: inst, unit: 'hour' }, { item: 'Bandwidth', price: bw, unit: 'Mbps-hr' }], monthlyEstimate: round((inst + bw * mbps) * HOURS), note: `${mbps} Mbps` };
+  });
+  const aws = await safe('AWS', 'ALB', 'AWS Price List', async () => {
+    const row = awsRows('ELB', 'Application LoadBalancer', R.aws).find((x) => /Hour|Hrs/i.test(x.unit) && x.usd > 0) || awsRows('ELB', 'LoadBalancerUsage', R.aws).find((x) => /Hour|Hrs/i.test(x.unit) && x.usd > 0);
+    if (!row) throw new Error('ALB hourly rate not found');
+    return { components: [{ item: 'ALB base', price: row.usd, unit: 'hour' }], monthlyEstimate: round(row.usd * HOURS), note: 'base only — LCU (traffic) billed separately' };
+  });
+  const azure = await safe('Azure', 'Load Balancer', 'prices.azure.com', async () => {
+    // Azure LB Standard meters are region 'Global' — query without a region filter.
+    const r = (await getAzurePrice({ query: 'Load Balancer', top: 100 })) as { items?: Array<{ meter: string; price: number; unit: string }> };
+    const rows = (r.items || []).filter((x) => /Hour/i.test(x.unit) && x.price > 0).sort((a, b) => a.price - b.price);
+    if (!rows.length) throw new Error('Azure Load Balancer rate not found');
+    return { components: [{ item: rows[0].meter, price: rows[0].price, unit: 'hour' }], monthlyEstimate: round(rows[0].price * HOURS), note: 'base rule only — data + extra rules billed separately' };
+  });
+  const gcp = await safe('GCP', 'Cloud Load Balancing', 'Cloud Billing Catalog', async () => {
+    const rows = (await gcpRows('Networking', 'Forwarding Rule', R.gcp)).filter((x) => x.usd != null && x.usd > 0);
+    if (!rows.length) throw new Error('Cloud Load Balancing rate not found');
+    const per = rows.sort((a, b) => a.usd! - b.usd!)[0];
+    return { components: [{ item: per.description.slice(0, 45), price: per.usd!, unit: per.unit || 'hour' }], monthlyEstimate: round(per.usd! * HOURS), note: 'forwarding rule only — data processing billed separately' };
+  });
+
+  return {
+    comparable: true,
+    comparison: [oci, aws, azure, gcp],
+    caveats: [
+      `L7 load balancer base cost at ${mbps} Mbps. Only OCI bills bandwidth in the base; AWS LCU / Azure rules+data / GCP data-processing are EXCLUDED — real cost is higher and traffic-dependent.`,
+      'OCI Network Load Balancer (L4) is free.',
+    ],
+  };
+}
+
 const CATALOG: Record<Category, (region: keyof typeof REGIONS, sizing: Sizing) => Promise<{ comparable: boolean; comparison: CloudResult[]; caveats: string[] }>> = {
   'object-storage': objectStorage,
   serverless,
   'database-postgres': databasePostgres,
   kubernetes,
   'data-warehouse': dataWarehouse,
+  'cache-redis': cacheRedis,
+  'load-balancer': loadBalancer,
 };
 
 export interface CompareServiceParams {

@@ -922,11 +922,11 @@ const TOOLS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
-        category: { type: 'string', enum: ['object-storage', 'serverless', 'database-postgres', 'kubernetes', 'data-warehouse'] },
-        region: { type: 'string', enum: ['us', 'br'], description: 'Region preset mapped per cloud (default us)' },
+        category: { type: 'string', enum: ['object-storage', 'serverless', 'database-postgres', 'kubernetes', 'data-warehouse', 'cache-redis', 'load-balancer'] },
+        region: { type: 'string', enum: ['us', 'br', 'eu'], description: 'Region preset mapped per cloud (default us)' },
         sizing: {
           type: 'object',
-          description: 'Category sizing: storage {storageGB,tier}; serverless {monthlyInvocations,avgDurationMs,memoryMB}; database-postgres/data-warehouse {ocpus,memoryGB,storageGB,awsRdsInstanceType}; kubernetes {nodeCount,vcpu,memoryGB,awsNodeType,azureNodeType,gcpNodeType}',
+          description: 'Category sizing: storage {storageGB,tier}; serverless {monthlyInvocations,avgDurationMs,memoryMB}; database-postgres/data-warehouse {ocpus,memoryGB,storageGB,awsRdsInstanceType}; kubernetes {nodeCount,vcpu,memoryGB,awsNodeType,azureNodeType,gcpNodeType}; cache-redis {memoryGB,awsCacheNodeType}; load-balancer {bandwidthMbps}',
         },
       },
       required: ['category'],
