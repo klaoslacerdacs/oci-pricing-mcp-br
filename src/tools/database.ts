@@ -136,7 +136,12 @@ export async function calculateDatabaseCost(params: CalculateDatabaseCostParams)
   // Prices pulled live per part number (bundled snapshot as fallback).
   if (params.type === 'postgresql') {
     const round = (n: number) => Math.round(n * 100) / 100;
-    const memoryGB = params.memoryGB ?? params.computeUnits * 16;
+    // OCI Managed PostgreSQL floor: 1 OCPU + 16 GB RAM.
+    const computeUnits = Math.max(1, params.computeUnits);
+    const memoryGB = Math.max(16, params.memoryGB ?? computeUnits * 16);
+    if (computeUnits !== params.computeUnits || (params.memoryGB !== undefined && memoryGB !== params.memoryGB)) {
+      notes.push(`PostgreSQL minimum is 1 OCPU / 16 GB; clamped to ${computeUnits} OCPU / ${memoryGB} GB`);
+    }
     const [pg, e5Ocpu, e5Mem, stor] = await Promise.all([
       getLiveSkuPrice('B99060'), // Database with PostgreSQL - X86 (OCPU/hr)
       getLiveSkuPrice('B97384'), // Compute - Standard - E5 - OCPU
@@ -144,8 +149,8 @@ export async function calculateDatabaseCost(params: CalculateDatabaseCostParams)
       getLiveSkuPrice('B99062'), // Database Optimized Storage (GB/month)
     ]);
     const rows: Array<[string, number, string, number | null, number]> = [
-      ['Database with PostgreSQL - X86 (managed)', params.computeUnits, 'OCPU', pg, (pg ?? 0) * params.computeUnits * hoursPerMonth],
-      ['Compute - Standard - E5 - OCPU', params.computeUnits, 'OCPU', e5Ocpu, (e5Ocpu ?? 0) * params.computeUnits * hoursPerMonth],
+      ['Database with PostgreSQL - X86 (managed)', computeUnits, 'OCPU', pg, (pg ?? 0) * computeUnits * hoursPerMonth],
+      ['Compute - Standard - E5 - OCPU', computeUnits, 'OCPU', e5Ocpu, (e5Ocpu ?? 0) * computeUnits * hoursPerMonth],
       ['Compute - Standard - E5 - Memory', memoryGB, 'GB', e5Mem, (e5Mem ?? 0) * memoryGB * hoursPerMonth],
       ['Database Optimized Storage', params.storageGB, 'GB', stor, (stor ?? 0) * params.storageGB],
     ];

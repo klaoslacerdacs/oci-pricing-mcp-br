@@ -322,6 +322,17 @@ export async function fetchRealTimePricing(options?: {
 }
 
 /**
+ * Get a single SKU's price from the bundled snapshot by part number (synchronous).
+ * Use for stable SKUs (e.g. Windows OS license) where a live async call isn't worth it.
+ */
+export function getBundledSkuPrice(partNumber: string): number | null {
+  const p = getAllProducts().find((x: { partNumber: string }) => x.partNumber === partNumber) as
+    | { priceUSD?: number }
+    | undefined;
+  return typeof p?.priceUSD === 'number' ? p.priceUSD : null;
+}
+
+/**
  * Get a single SKU's live PAY_AS_YOU_GO unit price by part number.
  * Falls back to the bundled products[] price (same API, snapshotted at build time)
  * if the live call fails or the SKU is absent. Returns null if nowhere found.

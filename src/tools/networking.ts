@@ -92,7 +92,7 @@ export function listNetworkingOptions(params: ListNetworkingOptionsParams = {}):
     tips: [
       'Network Load Balancer (L4) is completely FREE - no hourly or data charges',
       'VCN, subnets, route tables, security lists are all FREE',
-      'First Flexible LB and 10 Mbps bandwidth free for paid accounts',
+      'Paid-by-default: Flexible Load Balancer + bandwidth are billed (no free-tier credit)',
       '10 TB/month outbound data transfer FREE - lowest in industry',
       'FastConnect is port-only pricing; partner fees are separate',
       'Service Gateway provides FREE private access to OCI services',
@@ -130,20 +130,13 @@ export function calculateNetworkingCost(params: CalculateNetworkingCostParams): 
     const lbPrice = networking.find((n) => n.type === 'flexible-load-balancer');
     if (lbPrice) {
       const lbCost = lbPrice.pricePerUnit * params.flexibleLoadBalancers * 730;
-
-      // First LB is free for paid accounts
-      if (params.flexibleLoadBalancers >= 1) {
-        freeCredits += lbPrice.pricePerUnit * 730;
-        notes.push('First Flexible Load Balancer is free for paid accounts');
-      }
-
+      // Paid-by-default: Load Balancer is NOT free-tier eligible.
       breakdown.push({
         item: 'Flexible Load Balancer (base)',
         quantity: params.flexibleLoadBalancers,
         unit: 'instance',
         unitPrice: lbPrice.pricePerUnit,
         monthlyTotal: Math.round(lbCost * 100) / 100,
-        note: params.flexibleLoadBalancers === 1 ? 'First one free' : undefined,
       });
     }
   }
@@ -153,22 +146,13 @@ export function calculateNetworkingCost(params: CalculateNetworkingCostParams): 
     const bwPrice = networking.find((n) => n.type === 'flexible-load-balancer-bandwidth');
     if (bwPrice) {
       const bwCost = bwPrice.pricePerUnit * params.loadBalancerBandwidthMbps * 730;
-
-      // First 10 Mbps is free
-      if (params.loadBalancerBandwidthMbps <= 10) {
-        freeCredits += bwCost;
-        notes.push('First 10 Mbps bandwidth is free for paid accounts');
-      } else {
-        freeCredits += bwPrice.pricePerUnit * 10 * 730;
-      }
-
+      // Paid-by-default: LB bandwidth is NOT free-tier eligible.
       breakdown.push({
         item: 'Load Balancer Bandwidth',
         quantity: params.loadBalancerBandwidthMbps,
         unit: 'Mbps',
         unitPrice: bwPrice.pricePerUnit,
         monthlyTotal: Math.round(bwCost * 100) / 100,
-        note: 'First 10 Mbps free',
       });
     }
   }
@@ -194,12 +178,13 @@ export function calculateNetworkingCost(params: CalculateNetworkingCostParams): 
       const billableGB = Math.max(0, params.outboundDataGB - freeGB);
       const egressCost = egressPrice.pricePerUnit * billableGB;
 
+      // Free egress is modeled as a $0 line (only billableGB is charged), NOT as a
+      // credit — a credit here would wrongly offset unrelated paid items (e.g. LB).
+      const freeValue = Math.round(egressPrice.pricePerUnit * Math.min(params.outboundDataGB, freeGB) * 100) / 100;
       if (params.outboundDataGB <= freeGB) {
-        freeCredits += egressPrice.pricePerUnit * params.outboundDataGB;
-        notes.push(`All ${params.outboundDataGB} GB outbound transfer covered by free tier`);
+        notes.push(`All ${params.outboundDataGB} GB outbound free (10 TB tier; ~$${freeValue} value)`);
       } else {
-        freeCredits += egressPrice.pricePerUnit * freeGB;
-        notes.push(`First 10 TB (${freeGB} GB) outbound is free. Charging for ${billableGB} GB.`);
+        notes.push(`First 10 TB free (~$${freeValue} value); charging ${billableGB} GB`);
       }
 
       breakdown.push({

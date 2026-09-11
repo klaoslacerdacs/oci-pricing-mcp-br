@@ -37,7 +37,7 @@ const { version: VERSION } = require('../package.json') as { version: string };
 
 // Import tools
 import { getPricing, listServices, compareRegions, listRegions } from './tools/core.js';
-import { calculateMonthlyCost, quickEstimate } from './tools/calculator.js';
+import { calculateMonthlyCost, quickEstimate, convertUsdToBrl } from './tools/calculator.js';
 import { listComputeShapes, getComputeShapeDetails, compareComputeShapes } from './tools/compute.js';
 import { listStorageOptions, calculateStorageCost, compareStorageTiers } from './tools/storage.js';
 import { listDatabaseOptions, calculateDatabaseCost, compareDatabaseOptions } from './tools/database.js';
@@ -157,6 +157,8 @@ const TOOLS = [
             ocpus: { type: 'number', description: 'Number of OCPUs' },
             memoryGB: { type: 'number', description: 'Memory in GB' },
             hoursPerMonth: { type: 'number', description: 'Hours per month (default: 730 for 24/7)' },
+            os: { type: 'string', enum: ['linux', 'windows'], description: 'OS; windows adds a per-OCPU license SKU' },
+            burstBaseline: { type: 'number', description: 'Burstable baseline fraction (0<x<=1); reduces Windows license OCPUs' },
           },
           required: ['shape', 'ocpus', 'memoryGB'],
         },
@@ -188,6 +190,19 @@ const TOOLS = [
         },
         region: { type: 'string', description: 'OCI region (default: us-ashburn-1)' },
       },
+    },
+  },
+  {
+    name: 'convert_usd_brl',
+    description: 'Convert a USD amount to BRL, grossing up Brazilian taxes (BRL = USD * fxRate / taxDivisor). Defaults FX 5.23, divisor 0.87, overridable via env OCI_FX_BRL / OCI_TAX_DIVISOR or params.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        usd: { type: 'number', description: 'Amount in USD' },
+        fxRate: { type: 'number', description: 'USD->BRL rate (default 5.23 or env OCI_FX_BRL)' },
+        taxDivisor: { type: 'number', description: 'Tax gross-up divisor (default 0.87 or env OCI_TAX_DIVISOR)' },
+      },
+      required: ['usd'],
     },
   },
   {
@@ -854,6 +869,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         break;
       case 'calculate_monthly_cost':
         result = calculateMonthlyCost(typedArgs);
+        break;
+      case 'convert_usd_brl':
+        result = convertUsdToBrl(typedArgs);
         break;
       case 'quick_estimate':
         result = quickEstimate(typedArgs);

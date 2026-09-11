@@ -542,6 +542,8 @@ export interface CostEstimateInput {
     ocpus: number;
     memoryGB: number;
     hoursPerMonth?: number;
+    os?: 'linux' | 'windows';
+    burstBaseline?: number; // burstable baseline fraction (0<x<=1), reduces Windows license OCPUs
   };
   storage?: {
     blockVolumeGB?: number;

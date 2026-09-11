@@ -9,7 +9,10 @@ import {
   getNetworkingPricing,
   getLastUpdated,
   getFreeTier,
+  getBundledSkuPrice,
 } from '../data/fetcher.js';
+
+const WINDOWS_OS_SKU = 'B88318'; // Compute - Windows OS, per OCPU/hr
 import type { CostEstimateInput, CostEstimateResult, OCIRegion, ComputeShapePricing } from '../types.js';
 
 const HOURS_PER_MONTH = 730; // Average hours in a month
@@ -55,6 +58,26 @@ export function calculateMonthlyCost(input: CostEstimateInput): CostEstimateResu
         monthlyTotal: memoryCost,
       });
       totalMonthly += memoryCost;
+
+      // Windows OS license (separate SKU, billed per OCPU/hr on top of compute).
+      // Burstable instances bill the license only on the baseline fraction of OCPUs.
+      if (input.compute.os === 'windows') {
+        const winPrice = getBundledSkuPrice(WINDOWS_OS_SKU) ?? 0.092;
+        const baseline = input.compute.burstBaseline;
+        const billedOcpus =
+          baseline && baseline > 0 && baseline <= 1 ? input.compute.ocpus * baseline : input.compute.ocpus;
+        const winCost = winPrice * billedOcpus * hoursPerMonth;
+        breakdown.push({
+          category: 'Compute',
+          item: baseline ? `Windows OS license (burst baseline ${baseline})` : 'Windows OS license',
+          quantity: Math.round(billedOcpus * 1000) / 1000,
+          unit: 'OCPU',
+          unitPrice: winPrice,
+          monthlyTotal: winCost,
+        });
+        totalMonthly += winCost;
+        notes.push('Windows OS license price from bundled snapshot; verify with fetch_realtime_pricing.');
+      }
 
       // Check memory-to-OCPU ratio
       const ratio = input.compute.memoryGB / input.compute.ocpus;
@@ -228,7 +251,7 @@ export function calculateMonthlyCost(input: CostEstimateInput): CostEstimateResu
         });
         totalMonthly += bwCost;
 
-        notes.push('First LB and 10 Mbps free for paid accounts (not reflected in estimate).');
+        notes.push('Load Balancer billed as paid (no free-tier credit applied).');
       }
     }
 
@@ -260,13 +283,12 @@ export function calculateMonthlyCost(input: CostEstimateInput): CostEstimateResu
     }
   }
 
-  // Add free tier notes
-  const freeTier = getFreeTier();
-  if (freeTier) {
-    notes.push(
-      'OCI Always Free tier may reduce costs further (4 A1 OCPUs + 24GB RAM, 200GB block storage, etc.).'
-    );
-  }
+  // Paid-by-default policy: Always Free is NOT applied to compute, storage, DB,
+  // load balancer, or managed services. Only network egress (=<10 TB), public IPs
+  // and VCN are treated as free.
+  notes.push(
+    'Estimate uses 100% paid SKUs. Always Free applies only to network (egress =<10 TB, public IP, VCN).'
+  );
 
   return {
     breakdown,
@@ -274,6 +296,31 @@ export function calculateMonthlyCost(input: CostEstimateInput): CostEstimateResu
     currency: 'USD',
     region: input.region || ('us-ashburn-1' as OCIRegion),
     notes,
+  };
+}
+
+/**
+ * Convert a USD amount to BRL, grossing up Brazilian taxes.
+ * BRL = USD * fxRate / taxDivisor. Defaults (FX 5.23, divisor 0.87 ~= 13% tax)
+ * are overridable via env OCI_FX_BRL / OCI_TAX_DIVISOR or per-call params.
+ */
+export function convertUsdToBrl(params: { usd: number; fxRate?: number; taxDivisor?: number }): {
+  usd: number;
+  brl: number;
+  fxRate: number;
+  taxDivisor: number;
+  formula: string;
+} {
+  const fxRate = params.fxRate ?? (Number(process.env.OCI_FX_BRL) || 5.23);
+  const taxDivisor = params.taxDivisor ?? (Number(process.env.OCI_TAX_DIVISOR) || 0.87);
+  if (taxDivisor <= 0) throw new Error('taxDivisor must be > 0');
+  const brl = Math.round(((params.usd * fxRate) / taxDivisor) * 100) / 100;
+  return {
+    usd: params.usd,
+    brl,
+    fxRate,
+    taxDivisor,
+    formula: `BRL = USD ${params.usd} * ${fxRate} / ${taxDivisor}`,
   };
 }
 
