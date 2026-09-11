@@ -1,0 +1,2934 @@
+[
+{
+"category": "AI and Machine Learning",
+"service": "Dataset",
+"oci": [
+"Oracle Open Data"
+],
+"aws": [
+"Open Data on AWS"
+],
+"azure": [
+"Azure Open Datasets"
+],
+"gcp": [
+"Datasets"
+],
+"info": "Data provided by cloud vendors and third-parties for analysis, development, and research."
+},
+{
+"category": "AI and Machine Learning",
+"service": "Generative AI",
+"oci": [
+"Generative AI New",
+"Generative AI Agents Beta"
+],
+"aws": [
+"AWS Bedrock"
+],
+"azure": [
+"Azure OpenAI Service"
+],
+"gcp": [
+"Vertex AI Search and Coversation"
+],
+"info": "Managed service to provide functional and large language models"
+},
+{
+"category": "AI and Machine Learning",
+"service": "Optical Character Recognition (OCR)",
+"oci": [
+"Vision Free Tier"
+],
+"aws": [
+"Amazon Textract"
+],
+"azure": [
+"Azure Form Recognizer"
+],
+"gcp": [
+"Vision AI"
+],
+"info": "Managed service for performing text recognition."
+},
+{
+"category": "AI and Machine Learning",
+"service": "Pre-Configured Analytics",
+"oci": [
+"Fusion Analytics Warehouse"
+],
+"aws": [
+"Amazon FinSpace"
+],
+"azure": [],
+"gcp": [],
+"info": "Service that includes industry- and use case-specific analytics."
+},
+{
+"category": "AI and Machine Learning",
+"service": "Speech Recognition",
+"oci": [
+"Speech Free Tier"
+],
+"aws": [
+"Amazon Transcribe"
+],
+"azure": [
+"Speaker Recognition",
+"Speech to Text",
+"Speech Translation"
+],
+"gcp": [
+"Speech-to-Text"
+],
+"info": "Managed service to provide automatic speech recognition to convert speech to text."
+},
+{
+"category": "AI and Machine Learning",
+"service": "Text Analysis",
+"oci": [
+"Document Understanding",
+"Language"
+],
+"aws": [
+"Amazon Comprehend"
+],
+"azure": [
+"Azure Immersive Reader",
+"Cognitive Service for Language"
+],
+"gcp": [
+"Cloud Natural Language"
+],
+"info": "Managed service to perform text analysis, such as sentiment analysis, key-phrase extraction, text classification, and named entity recognition."
+},
+{
+"category": "AI and Machine Learning",
+"service": "Time-Series Forecasting",
+"oci": [
+"Forecasting"
+],
+"aws": [
+"Amazon Forecast"
+],
+"azure": [],
+"gcp": [],
+"info": "Managed service to provide forecasting based on time-series data."
+},
+{
+"category": "AI and Machine Learning",
+"service": "Data Preparation",
+"oci": [
+"Data Labeling"
+],
+"aws": [
+"AWS Entity Resolution",
+"Amazon SageMaker Data Wrangler",
+"Amazon SageMaker Ground Truth"
+],
+"azure": [
+"Azure Data Factory"
+],
+"gcp": [
+"Vertex Data Labeling",
+"Dataprep"
+],
+"info": "Service to identify properties of documents, text, and images, and annotating them with those properties."
+},
+{
+"category": "AI and Machine Learning",
+"service": "Image Recognition and Analysis",
+"oci": [
+"Vision Free Tier"
+],
+"aws": [
+"Amazon Rekognition"
+],
+"azure": [
+"Computer Vision",
+"Custom Vision",
+"Face API"
+],
+"gcp": [
+"Vision AI"
+],
+"info": "Managed service to analyze static images by detecting objects, scenes, text, activities and other content."
+},
+{
+"category": "AI and Machine Learning",
+"service": "Managed Machine Learning",
+"oci": [
+"ML Pipelines",
+"Data Science Free"
+],
+"aws": [
+"AWS Deep Learning Containers",
+"PyTorch on AWS",
+"TensorFlow on AWS",
+"Amazon SageMaker HyperPod",
+"Amazon SageMaker",
+"Apache MXNet on AWS",
+"AWS Deep Learning AMIs",
+"Amazon SageMaker Serverless Inference"
+],
+"azure": [
+"Azure Applied AI Services",
+"Azure Cognitive Services",
+"Azure Machine Learning",
+"Azure Databricks",
+"Data Science Virtual Machines",
+"Azure Analysis services",
+"R Server for HDInsight",
+"Azure Lab Services"
+],
+"gcp": [
+"AutoML",
+"AutoML Tables [deprecated]",
+"Deep Learning VM Image",
+"Deep Learning Containers",
+"TensorFlow Enterprise",
+"Vertex AI",
+"Document AI",
+"Vertex AI Workbench",
+"Firebase ML [Beta]"
+],
+"info": "Managed service to build, train, and manage machine learning models."
+},
+{
+"category": "Analytics and BI",
+"service": "Managed Jupyter Notebook",
+"oci": [
+"Data Flow notebooks"
+],
+"aws": [
+"Amazon SageMaker Notebook Instances"
+],
+"azure": [
+"Jupyter notebooks"
+],
+"gcp": [
+"Managed Notebooks"
+],
+"info": "Managed environment providing Jupyter notebooks for analytics"
+},
+{
+"category": "Analytics and BI",
+"service": "Data Exploration",
+"oci": [
+"OCI Search with OpenSearch"
+],
+"aws": [
+"Amazon OpenSearch Service",
+"Amazon OpenSearch Serverless"
+],
+"azure": [
+"Azure Data Explorer"
+],
+"gcp": [
+"Colab Enterprise"
+],
+"info": "Managed service to search, visualize, and analyze data."
+},
+{
+"category": "Analytics and BI",
+"service": "Visualization",
+"oci": [
+"Oracle Analytics Cloud"
+],
+"aws": [
+"Amazon QuickSight"
+],
+"azure": [
+"Microsoft Fabric [Preview]",
+"Power BI Embedded",
+"Microsoft Power BI on Azure"
+],
+"gcp": [
+"Google Data Studio",
+"Looker"
+],
+"info": "Service to explore, view, and understand data through a variety of analytical methods and models."
+},
+{
+"category": "Blockchain",
+"service": "Non-fungible Token (NFT)",
+"oci": [
+"NFT on Oracle Blockchain"
+],
+"aws": [],
+"azure": [],
+"gcp": [],
+"info": "Built-in support for NFT based on ERC-721 specification."
+},
+{
+"category": "Blockchain",
+"service": "Blockchain",
+"oci": [
+"Blockchain Platform"
+],
+"aws": [
+"Amazon Managed Blockchain",
+"Amazon Managed Blockchain (AMB) Access Polygon"
+],
+"azure": [],
+"gcp": [],
+"info": "Managed blockchain platform for building and running smart contracts and maintaining a tamper-resistent distributed ledger."
+},
+{
+"category": "Business Application",
+"service": "Corporate Search",
+"oci": [
+"OCI Search with OpenSearch"
+],
+"aws": [
+"Amazon CloudSearch"
+],
+"azure": [],
+"gcp": [],
+"info": "Managed capability to build and maintain search across websites and applications."
+},
+{
+"category": "Compute",
+"service": "Burstable Compute",
+"oci": [
+"Burstable Instances"
+],
+"aws": [
+"Amazon EC2 Burstable performance instances"
+],
+"azure": [
+"B-Series Burstable Virtual Machines Sizes"
+],
+"gcp": [
+"Shared-core Machine Types"
+],
+"info": "A virtual machine that provides a baseline level of CPU performance with the ability to burst to a higher level to support occasional spikes in usage."
+},
+{
+"category": "Compute",
+"service": "Encrypted or Sensitive Compute",
+"oci": [
+"OCI Confidential Computing"
+],
+"aws": [
+"AWS Nitro Enclaves"
+],
+"azure": [
+"Azure Confidential Computing"
+],
+"gcp": [
+"Confidential VM"
+],
+"info": "Virtual machines that encrypt data in use while it is being processed, in addition to encrypting data at rest and in motion."
+},
+{
+"category": "Compute",
+"service": "GPU-Accelerated Compute",
+"oci": [
+"GPU Shapes"
+],
+"aws": [
+"Amazon EC2 Accelerated Computing"
+],
+"azure": [
+"GPU Optimized Virtual Machines"
+],
+"gcp": [
+"Cloud GPUs"
+],
+"info": "Virtual machines that accelerate certain classes of workloads by incorporating graphical processing units (GPU), which provide specialized, parallel processing capabilities."
+},
+{
+"category": "Compute",
+"service": "Managed Application Environment",
+"oci": [
+"WebLogic Server for OCI",
+"WebLogic Server for OKE"
+],
+"aws": [
+"Amazon Lightsail",
+"AWS Elastic Beanstalk",
+"Amazon Lightsail for Research",
+"AWS SimSpace Weaver"
+],
+"azure": [
+"Web App for Containers",
+"Static Web Apps",
+"Web Apps"
+],
+"gcp": [
+"App Engine"
+],
+"info": "Application environment where compute resources are provided as a managed capability. The platform will determine and provision the number and type of compute resource needed automatically."
+},
+{
+"category": "Compute",
+"service": "Auto Scaling",
+"oci": [
+"Autoscaling"
+],
+"aws": [
+"Amazon EC2 Auto Scaling",
+"AWS Auto Scaling"
+],
+"azure": [
+"Virtual Machine Scale Sets",
+"Azure Autoscale"
+],
+"gcp": [
+"Compute Engine Autoscaling"
+],
+"info": "Autoscaling automatically adjusts the number or lifecycle state of compute instances in an instance pool. This can help provide consistent performance for end users during periods of high demand while also reducing costs during periods of low demand."
+},
+{
+"category": "Compute",
+"service": "Compute",
+"oci": [
+"Compute Free Tier"
+],
+"aws": [
+"Amazon Elastic Compute Cloud"
+],
+"azure": [
+"Linux Virtual Machines",
+"Virtual Machines"
+],
+"gcp": [
+"Compute Engine"
+],
+"info": "Computing resources delivered as virtual machines or physical servers to deploy and run applications."
+},
+{
+"category": "Compute",
+"service": "Dedicated Host",
+"oci": [
+"Dedicated Virtual Machine Hosts"
+],
+"aws": [
+"Amazon EC2 Dedicated Hosts"
+],
+"azure": [
+"Azure Dedicated Host"
+],
+"gcp": [
+"Sole-tenant Nodes"
+],
+"info": "A secluded environment for virtual machines that exclude virtual machines from other tenants running on the underlying host."
+},
+{
+"category": "Compute",
+"service": "Guaranteed Compute Capacity",
+"oci": [
+"Reserved Capacity"
+],
+"aws": [
+"On-Demand Capacity Reservation"
+],
+"azure": [
+"Azure Reserved Virtual Machine Instances"
+],
+"gcp": [
+"Compute Engine reservations"
+],
+"info": "Reserved compute capacity assures that spare capacity will be available when required in the future."
+},
+{
+"category": "Compute",
+"service": "Hardened Compute",
+"oci": [
+"Shielded Instances"
+],
+"aws": [],
+"azure": [
+"Trusted Launch for Azure VMs"
+],
+"gcp": [
+"Shielded VMs"
+],
+"info": "Compute capacity where the firmware and other measures have been taken to defend against malicious, boot-level software."
+},
+{
+"category": "Compute",
+"service": "Preemptible Capacity",
+"oci": [
+"Preemptible Capacity"
+],
+"aws": [
+"Amazon EC2 Spot Instances"
+],
+"azure": [
+"Azure Spot Virtual Machines"
+],
+"gcp": [
+"Spot VMs"
+],
+"info": "Compute capacity that affords significant discount in exchange for the ability to be interrupted when excess capacity is needed by the system."
+},
+{
+"category": "Compute",
+"service": "Specialty OS",
+"oci": [
+"Oracle Autonomous Linux Free",
+"Oracle Linux"
+],
+"aws": [
+"Amazon Linux 02023",
+"FreeRTOS",
+"Amazon Linux 2"
+],
+"azure": [
+"Azure Linux Container Host for AKS",
+"Windows 10 IoT Core Services",
+"Azure RTOS",
+"Windows for IoT"
+],
+"gcp": [
+"Container-Optimized OS"
+],
+"info": "An operating system created or maintained by the cloud vendor."
+},
+{
+"category": "Compute",
+"service": "Bare Metal Server",
+"oci": [
+"Bare Metal Shapes"
+],
+"aws": [
+"Amazon EC2 Bare Metal Instances"
+],
+"azure": [
+"BareMetal Infrastructure"
+],
+"gcp": [
+"Bare Metal"
+],
+"info": "Bare metal compute provide direct access to the server hardware without any intervening hypervisor, which provides maximum performance."
+},
+{
+"category": "Compute",
+"service": "HPC Compute",
+"oci": [
+"HPC Shapes"
+],
+"aws": [
+"Amazon EC2 Compute Optimized"
+],
+"azure": [
+"HIgh Performance Computing VM Sizes"
+],
+"gcp": [
+"High Performance Computing"
+],
+"info": "Compute capacity designed for high-performance computing workloads that require high-frequency processor cores and cluster networking for massively parallel and compute-intensive workloads."
+},
+{
+"category": "Compute",
+"service": "Compute Optimizer",
+"oci": [
+"Cloud Advisor Free"
+],
+"aws": [
+"AWS Compute Optimizer"
+],
+"azure": [
+"Azure Advisor"
+],
+"gcp": [
+"Recommender"
+],
+"info": "A service or advisor that explicitly offer guidance on reducing cost and potentially improving performance of computing resources."
+},
+{
+"category": "Compute",
+"service": "VMware",
+"oci": [
+"Oracle Cloud VMware Solution"
+],
+"aws": [
+"VMware Cloud on AWS"
+],
+"azure": [
+"Azure VMware Solution"
+],
+"gcp": [
+"Google Cloud VMware Engine"
+],
+"info": "Managed VMware-enabled compute capacity."
+},
+{
+"category": "Container and Serverless",
+"service": "Function",
+"oci": [
+"OCI Functions Free Tier"
+],
+"aws": [
+"Amazon S3 Object Lambda",
+"AWS Lambda"
+],
+"azure": [
+"Azure Functions"
+],
+"gcp": [
+"Cloud Functions for Firebase",
+"Cloud Functions",
+"Cloud Functions, 2nd gen"
+],
+"info": "Serverless business logic execution environment."
+},
+{
+"category": "Container and Serverless",
+"service": "Container Image Registry",
+"oci": [
+"Container Registry Free"
+],
+"aws": [
+"Amazon Elastic Container Registry"
+],
+"azure": [
+"Azure Container Registry"
+],
+"gcp": [
+"Container Registry [deprecated]"
+],
+"info": "Managed registry to store, share, and administrate container images, such as Docker images."
+},
+{
+"category": "Container and Serverless",
+"service": "Managed Container Service",
+"oci": [
+"OCI Kubernetes Engine Free"
+],
+"aws": [
+"Red Hat OpenShift Service on AWS",
+"Amazon Elastic Container Service",
+"Amazon Elastic Kubernetes Service"
+],
+"azure": [
+"Azure Kubernetes Service",
+"Azure Red Hat OpenShift"
+],
+"gcp": [
+"Google Kubernetes Engine",
+"Confidential Googke Kubernetes Engine",
+"Google Kubernetes Engine Enterprise [Pre-GA]"
+],
+"info": "Managed service for deploying, scaling, and managing containerized applications."
+},
+{
+"category": "Container and Serverless",
+"service": "Container Instance",
+"oci": [
+"Container Instances"
+],
+"aws": [
+"AWS App Runner",
+"AWS Fargate"
+],
+"azure": [
+"Azure Container Instances",
+"Azure Container App Service"
+],
+"gcp": [
+"Cloud Run",
+"Cloud Run for Anthos"
+],
+"info": "Container Instance is a serverless compute service for running containers in a simple, quick, and secure way without managing any infrastructure."
+},
+{
+"category": "Data Management",
+"service": "Graph Database",
+"oci": [
+"Autonomous Database Free Tier"
+],
+"aws": [
+"Amazon Neptune serverless",
+"Amazon Neptune Analytics",
+"Amazon Neptune"
+],
+"azure": [
+"Azure Cosmos DB (via Gremlin API)"
+],
+"gcp": [],
+"info": "Database that is primarily built to handle graph relations, typically using nodes and edges."
+},
+{
+"category": "Data Management",
+"service": "In-Memory Caching",
+"oci": [
+"OCI Caching Service with Redis"
+],
+"aws": [
+"Amazon ElastiCache Serverless",
+"Amazon ElastiCache",
+"Amazon MemoryDB for Redis"
+],
+"azure": [
+"Azure Cache for Redis"
+],
+"gcp": [
+"Memorystore",
+"Memorystore for Redis Cluster"
+],
+"info": "Managed application and database acceleration using caching software. Can also be a primary datastore for workloads not requiring durability."
+},
+{
+"category": "Data Management",
+"service": "Relational Database",
+"oci": [
+"Oracle Database Service for Azure",
+"Oracle Base Database Service",
+"Autonomous Transaction Processing Free Tier",
+"MySQL Heatwave database",
+"Autonomous Database Free Tier",
+"Globally Distributed Autonomous Database New",
+"Oracle Database@Azure",
+"OCI Database with PostgreSQL"
+],
+"aws": [
+"Amazon Aurora Limitless",
+"Amazon RDS for Db2",
+"Amazon Aurora",
+"Amazon Aurora Serverless v2",
+"Amazon RDS for MySQL",
+"Amazon RDS on VMware",
+"Amazon RDS for MariaDB",
+"Amazon RDS for Oracle",
+"Amazon RDS for PostgreSQL",
+"Amazon RDS for Microsoft SQL Server"
+],
+"azure": [
+"Azure Database for MariaDB",
+"Azure Database for MySQL",
+"Azure Database for PostgreSQL",
+"Azure SQL",
+"Azure SQL Database",
+"Azure SQL Edge",
+"Azure SQL Managed Instance",
+"SQL Server on Virtual Machines"
+],
+"gcp": [
+"AlloyDB for PostgreSQL",
+"Cloud SQL for SQL Server",
+"Cloud Spanner",
+"Cloud SQL for MySQL",
+"Cloud SQL for PostgreSQL",
+"AlloyDB Omni"
+],
+"info": "Managed database service focused on the relational model with support for diverse datatypes."
+},
+{
+"category": "Data Management",
+"service": "Data Lake",
+"oci": [
+"MySQL HeatWave Lakehouse",
+"OCI Data Lake LA"
+],
+"aws": [
+"AWS Lake Formation"
+],
+"azure": [
+"Azure Data Lake Storage",
+"Azure Data Lake Storage Gen1",
+"Data Lake Analytics"
+],
+"gcp": [],
+"info": "Managed service to create a centralized, curated, and secured repository of raw and transformed data in preparation for analytics."
+},
+{
+"category": "Data Management",
+"service": "Data Warehouse",
+"oci": [
+"Autonomous Data Warehouse",
+"MySQL Heatwave database",
+"Autonomous Database Free Tier"
+],
+"aws": [
+"Amazon Redshift"
+],
+"azure": [
+"Azure Synapse Analytics"
+],
+"gcp": [
+"BigQuery"
+],
+"info": "Managed database service optimized for analytic workloads, including data marts, data warehouses, and data lakes."
+},
+{
+"category": "Data Management",
+"service": "Document Database",
+"oci": [
+"Autonomous JSON Database Free Tier"
+],
+"aws": [
+"Amazon DocumentDB Elastic Clusters",
+"Amazon DocumentDB"
+],
+"azure": [
+"Azure Cosmos DB"
+],
+"gcp": [
+"Firestore"
+],
+"info": "Database primary built to handle the JSON datatype."
+},
+{
+"category": "Data Management",
+"service": "Fast Provisioning Database",
+"oci": [
+"Fast Provisioning Database"
+],
+"aws": [],
+"azure": [],
+"gcp": [],
+"info": "A database with accelerated provisioning time."
+},
+{
+"category": "Data Management",
+"service": "Hadoop Big Data Service",
+"oci": [
+"Big Data"
+],
+"aws": [
+"Amazon EMR Serverless",
+"Amazon EMR"
+],
+"azure": [
+"HDInsight"
+],
+"gcp": [
+"Dataproc",
+"Dataproc Confidential Compute"
+],
+"info": "Managed Hadoop cluster system to accomodate \"big data\" and analytics workloads."
+},
+{
+"category": "Data Management",
+"service": "Ledger Database",
+"oci": [
+"Oracle Blockchain Table"
+],
+"aws": [
+"Amazon Quantum Ledger Database"
+],
+"azure": [
+"Azure Confidential Ledger"
+],
+"gcp": [],
+"info": "Managed database where changes are immutable and cryptographically verified."
+},
+{
+"category": "Data Management",
+"service": "Metadata Management",
+"oci": [
+"Data Catalog Free"
+],
+"aws": [
+"AWS Glue Data Catalog",
+"Amazon DataZone"
+],
+"azure": [
+"Data Catalog",
+"Microsoft Purview"
+],
+"gcp": [
+"Dataplex",
+"Data Catalog"
+],
+"info": "Managed data discovery and governance solution for technical, business, and operational metadata."
+},
+{
+"category": "Data Management",
+"service": "Oracle Database Management",
+"oci": [
+"Database Management"
+],
+"aws": [],
+"azure": [],
+"gcp": [],
+"info": "Service to perform diagnostic and management capabilities for Oracle databases."
+},
+{
+"category": "Data Management",
+"service": "Spark",
+"oci": [
+"Data Flow Free"
+],
+"aws": [
+"Amazon EMR Serverless",
+"Amazon EMR"
+],
+"azure": [
+"Azure Databricks"
+],
+"gcp": [
+"Dataproc"
+],
+"info": "Managed service for running Apache Spark applications."
+},
+{
+"category": "Data Management",
+"service": "Time Series Database",
+"oci": [
+"Autonomous Database Free Tier"
+],
+"aws": [
+"Amazon Timestream"
+],
+"azure": [],
+"gcp": [],
+"info": "Managed database primarily built for time series data and related analytics."
+},
+{
+"category": "Data Management",
+"service": "Hardware-Accelerated Database",
+"oci": [
+"Exadata Cloud Service",
+"Exadata Cloud@Customer"
+],
+"aws": [],
+"azure": [],
+"gcp": [],
+"info": "Managed database service that leverages dedicated, purpose-built hardware to accelerate database operations."
+},
+{
+"category": "Data Management",
+"service": "NoSQL Database",
+"oci": [
+"NoSQL Database Free Tier"
+],
+"aws": [
+"Amazon DynamoDB",
+"Amazon Keyspaces"
+],
+"azure": [
+"Azure Cosmos DB",
+"Azure Managed Instance for Apache Cassandra",
+"Table Storage"
+],
+"gcp": [
+"Firebase Realtime Database",
+"Cloud Bigtable",
+"Datastore"
+],
+"info": "Managed database that supports JSON, table, and key-value datatypes with flexible transaction guarantees."
+},
+{
+"category": "Developer Services",
+"service": "Email Distribution",
+"oci": [
+"Email Delivery"
+],
+"aws": [
+"Amazon Simple Email Service"
+],
+"azure": [],
+"gcp": [],
+"info": "Managed service to provide email sending service and SMTP relay for both high volume bulk and transactional emails, optionally with reputation control."
+},
+{
+"category": "Developer Services",
+"service": "Publish and Subscribe",
+"oci": [
+"Notifications Free"
+],
+"aws": [
+"Amazon Simple Notification Service"
+],
+"azure": [
+"Azure Web PubSub",
+"Service Bus",
+"Notification Hubs"
+],
+"gcp": [
+"Pub/Sub",
+"Firebase Cloud Messaging"
+],
+"info": "Managed service to provide publish and subscribe messaging service between different system and service types."
+},
+{
+"category": "Developer Services",
+"service": "Desktop-Based Command Line Interface (CLI)",
+"oci": [
+"Command Line Interface"
+],
+"aws": [
+"AWS Command Line Interface"
+],
+"azure": [
+"Azure Command-Line Interface"
+],
+"gcp": [
+"Google Cloud Command Line Interface (CLI), gsutil and gcloud"
+],
+"info": "Tool to manage cloud vendor resources from the command line."
+},
+{
+"category": "Developer Services",
+"service": "Digital Assistant",
+"oci": [
+"Digital Assistant",
+"Generative AI chat New"
+],
+"aws": [
+"Amazon Q",
+"Alexa for Business",
+"Amazon Lex",
+"AWS Chatbot"
+],
+"azure": [
+"Azure Bot Services",
+"Power Virtual Agents"
+],
+"gcp": [
+"Dialogflow"
+],
+"info": "Managed service that provides and deploys digital assistants, which are AI-driven interfaces that help users accomplish a variety of tasks in natural language conversations."
+},
+{
+"category": "Developer Services",
+"service": "Software Framework",
+"oci": [],
+"aws": [],
+"azure": [],
+"gcp": [],
+"info": "A software framework is a platform that provides a foundation for developing software applications."
+},
+{
+"category": "Developer Services",
+"service": "Workflow Orchestration",
+"oci": [
+"Process Automation"
+],
+"aws": [
+"Amazon Managed Workflows for Apache Airflow",
+"AWS Step Functions"
+],
+"azure": [
+"Logic Apps"
+],
+"gcp": [
+"Cloud Composer",
+"Workflows"
+],
+"info": "Managed service to provide orchestration of tasks, applications, processes, and piplines, potentially across multiple services."
+},
+{
+"category": "Developer Services",
+"service": "API Deployment and Management",
+"oci": [
+"API Gateway Free Tier"
+],
+"aws": [
+"Amazon API Gateway"
+],
+"azure": [
+"API Management"
+],
+"gcp": [
+"API Gateway",
+"Apigee Hybrid",
+"Apigee Integration",
+"Cloud Endpoints",
+"Apigee API Management"
+],
+"info": "Managed API deployment and governance with policy enforcement."
+},
+{
+"category": "Developer Services",
+"service": "CI/CD",
+"oci": [
+"Oracle DevOps Service Free"
+],
+"aws": [
+"AWS CodeBuild",
+"AWS CodeDeploy",
+"AWS CodePipeline"
+],
+"azure": [
+"GitHub",
+"Azure DevOps",
+"Azure Pipelines",
+"Visual Studio App Center"
+],
+"gcp": [
+"Cloud Build",
+"Google Cloud Deploy",
+"Tekton"
+],
+"info": "Managed continuous integration and continuous delivery service."
+},
+{
+"category": "Developer Services",
+"service": "Cloud Native Application Development and Management",
+"oci": [
+"Mobile Hub",
+"Visual Builder Studio Free"
+],
+"aws": [
+"Amazon CodeCatalyst",
+"AWS CodeStar",
+"AWS Amplify"
+],
+"azure": [
+"Azure Spring Cloud",
+"Cloud Services",
+"App Service",
+"Xamarin"
+],
+"gcp": [
+"Knative",
+"Kubernetes application on Google Cloud Marketplace",
+"Firebase Hosting"
+],
+"info": "Comprehensive development platform for distribution applications"
+},
+{
+"category": "Developer Services",
+"service": "Cloud-Based Command Line Interface",
+"oci": [
+"Cloud Shell Free"
+],
+"aws": [
+"AWS CloudShell"
+],
+"azure": [
+"Cloud Shell"
+],
+"gcp": [
+"Cloud Shell"
+],
+"info": "Web browser-based terminal to run commands on a cloud vendor's infrastructure."
+},
+{
+"category": "Developer Services",
+"service": "Content Management",
+"oci": [
+"Content Management Free Tier"
+],
+"aws": [
+"Amazon WorkDocs"
+],
+"azure": [],
+"gcp": [],
+"info": "Managed service that provides collaboration and workflow capabilities for the creation and delivery of content."
+},
+{
+"category": "Developer Services",
+"service": "Developer Collaboration",
+"oci": [
+"Visual Builder Studio Agile Boards"
+],
+"aws": [
+"AWS re:Post Private",
+"AWS CodeStar"
+],
+"azure": [
+"Azure Boards"
+],
+"gcp": [],
+"info": "Service to enable development teams to plan, track, and discuss work using Kanban boards, backlogs, and team dashboards."
+},
+{
+"category": "Developer Services",
+"service": "Low Code Application",
+"oci": [
+"Oracle APEX Application Development Free Tier"
+],
+"aws": [
+"PartyRock",
+"Amazon Honeycode (ending 29-FEB-2024)"
+],
+"azure": [
+"Microsoft Power Pages",
+"Microsoft Dataverse",
+"Project Bonsai",
+"Power Apps",
+"Power Automate"
+],
+"gcp": [
+"AppSheet",
+"AppSheet Automation"
+],
+"info": "Development environment requiring little or no coding experience or capability in building applications."
+},
+{
+"category": "Developer Services",
+"service": "Other-Development",
+"oci": [
+"Database Tools Free"
+],
+"aws": [],
+"azure": [],
+"gcp": [],
+"info": "Development-related services not categorized elsewhere."
+},
+{
+"category": "Developer Services",
+"service": "Programming Language",
+"oci": [
+"Java Free"
+],
+"aws": [
+"Cedar",
+"Amazon Corretto"
+],
+"azure": [
+"Microsoft OpenJDK"
+],
+"gcp": [],
+"info": "Cloud vendor-developed programming language or a managed distribution of a programming language."
+},
+{
+"category": "Developer Services",
+"service": "Software and Artifact Repository",
+"oci": [
+"Artifact Registry Free"
+],
+"aws": [
+"AWS Serverless Application Repository",
+"AWS CodeArtifact",
+"AWS CodeCommit"
+],
+"azure": [
+"Azure Artifacts",
+"Azure Repos"
+],
+"gcp": [
+"Artifact Registry",
+"Cloud Source Repositories"
+],
+"info": "Managed service for storing, sharing, and managing software development packages, including version control capability."
+},
+{
+"category": "Developer Services",
+"service": "Software Development Kit",
+"oci": [
+"OCI Provider for Pulumi Free",
+"SDK for Java Free",
+"SDK for Python Free",
+"SDK for TypeScript and JavaScript Free",
+"SDK for .NET Free",
+"SDK for Go Free",
+"SDK for Ruby Free",
+"Oracle Developer Tools for VS Code Free"
+],
+"aws": [
+"AWS Encryption SDK",
+"Cloudscape",
+"AWS Toolkit for Azure DevOps",
+"AWS Cloud Development Kit",
+"AWS Tools and SDKs"
+],
+"azure": [
+"SDKs",
+"Azure PowerShell",
+"DevOps tools integrations"
+],
+"gcp": [
+"Cloud SDK Libraries for C#",
+"Cloud SDK Libraries for Ruby",
+"Cloud SDK Libraries for Java",
+"Tools for Eclipse",
+"Tools for Powershell",
+"Config Connector",
+"Cloud Code",
+"Maven App Engine Plugin",
+"Cloud SDK Libraries for Go",
+"Cloud SDK Libraries for Python",
+"Cloud SDK Libraries for PHP",
+"Cloud SDK Libraries for C++"
+],
+"info": "Plug-ins, extensions, and add-ons that cross many categories."
+},
+{
+"category": "Developer Services",
+"service": "State Change Events",
+"oci": [
+"Events Free"
+],
+"aws": [
+"Amazon EventBridge"
+],
+"azure": [
+"Event Grid"
+],
+"gcp": [
+"Eventarc"
+],
+"info": "Managed service to provide an event bus between multiple systems and services in response to state changes in the source system."
+},
+{
+"category": "Developer Services",
+"service": "Cloud-Based Development Tool",
+"oci": [
+"Code Editor",
+"Visual Builder Studio Free",
+"Oracle APEX Application Development Free Tier"
+],
+"aws": [
+"AWS Application Composer",
+"AWS Cloud9",
+"Amazon Honeycode (ending 29-FEB-2024)"
+],
+"azure": [],
+"gcp": [
+"Cloud Code for Cloud Shell",
+"Cloud Workstations"
+],
+"info": "Web browser-based integrated development environment for creating applications to run on the cloud vendor's infrastructure."
+},
+{
+"category": "Developer Services",
+"service": "Cloud Service Debugger",
+"oci": [
+"Application Service Monitoring"
+],
+"aws": [
+"AWS X-Ray"
+],
+"azure": [
+"Azure Monitor"
+],
+"gcp": [
+"Cloud Debugger"
+],
+"info": "Service to analyze, troubleshoot, and debug distributed applications, providing an end-to-end view of requests and their interaction with cloud services."
+},
+{
+"category": "Disaster Recovery",
+"service": "Disaster Recovery as-a-Service",
+"oci": [
+"Full Stack Disaster Recovery"
+],
+"aws": [
+"AWS Elastic Disaster Recovery"
+],
+"azure": [
+"Azure Site Recovery"
+],
+"gcp": [
+"Backup and DR Service"
+],
+"info": "Managed, full stack disaster recovery (DR) orchestration that includes virtual machines, storage, and databases. The service also provide recovery drills (dry-runs)."
+},
+{
+"category": "Distributed Cloud",
+"service": "Private Label Cloud",
+"oci": [
+"Oracle Alloy"
+],
+"aws": [],
+"azure": [],
+"gcp": [],
+"info": ""
+},
+{
+"category": "Distributed Cloud",
+"service": "On-Premises Cloud Services",
+"oci": [
+"Compute Cloud@Customer",
+"OCI Dedicated Region"
+],
+"aws": [
+"AWS Dedicated Local Zones",
+"AWS Outposts"
+],
+"azure": [
+"Azure Stack Hub",
+"Azure IoT Edge",
+"Azure Stack Edge",
+"Azure Stack HCI"
+],
+"gcp": [
+"Google Distributed Cloud Hosted",
+"Google Distributed Cloud"
+],
+"info": "Cloud vendor services provided at a customer's site with deployed hardware, either on-premises or at a customer-controlled location."
+},
+{
+"category": "Edge Devices",
+"service": "Portable Cloud Services",
+"oci": [
+"Roving Edge Infrastructure"
+],
+"aws": [
+"AWS Snowcone",
+"AWS Snowball Edge Compute Optimized"
+],
+"azure": [
+"Azure Modular Datacenter"
+],
+"gcp": [
+"Edge TPU"
+],
+"info": "Cloud service provided by deployed hardware where data is generated and consumed, regardless of network connectivity."
+},
+{
+"category": "End User Computing",
+"service": "Internal Application Access",
+"oci": [
+"Oracle Secure Global Desktop"
+],
+"aws": [
+"Amazon WorkLink"
+],
+"azure": [],
+"gcp": [
+"Identity-Aware Proxy"
+],
+"info": "Managed service to provide secure access to internal websites from mobile devices or web browsers."
+},
+{
+"category": "End User Computing",
+"service": "Document Sharing",
+"oci": [
+"Content Management Free Tier"
+],
+"aws": [
+"Amazon WorkDocs"
+],
+"azure": [
+"SharePoint"
+],
+"gcp": [
+"Google Workspace Essentials"
+],
+"info": "Managed service to provide a managed space for the creation, storage, and collaboration of documents."
+},
+{
+"category": "End User Computing",
+"service": "Virtual Desktop",
+"oci": [
+"OCI Secure Desktops"
+],
+"aws": [
+"Amazon WorkSpaces Thin Client",
+"Amazon WorkSpaces"
+],
+"azure": [
+"Azure Virtual Desktop",
+"Citrix Virtual Apps and Desktops for Azure",
+"VMWare Horizon Cloud on Microsoft Azure"
+],
+"gcp": [],
+"info": "Managed service to provide secure access to persistent desktops."
+},
+{
+"category": "Integration",
+"service": "ETL",
+"oci": [
+"Data Integration",
+"Data Integrator"
+],
+"aws": [
+"AWS Glue Elastic Views",
+"AWS Glue DataBrew",
+"Amazon Data Pipeline",
+"AWS Glue"
+],
+"azure": [
+"Azure Data Factory",
+"Microsoft Graph Data Connect"
+],
+"gcp": [
+"BigQuery Data Transfer Service",
+"Cloud Data Fusion"
+],
+"info": "Managed service to provide extract, transform, and load (ELT) capability to ingest data from a variety of data sources and load it to target resources."
+},
+{
+"category": "Integration",
+"service": "Application Integration",
+"oci": [
+"Data Integrator",
+"App Integration"
+],
+"aws": [
+"AppFabric",
+"AWS CodeConnections",
+"Amazon AppFlow",
+"Amazon EventBridge"
+],
+"azure": [
+"Azure Data Factory"
+],
+"gcp": [
+"Cloud Data Fusion",
+"Application Integration"
+],
+"info": "Managed service to provide integration between software-as-a-service (SaaS) applications."
+},
+{
+"category": "Integration",
+"service": "Ingest Streaming",
+"oci": [
+"Streaming"
+],
+"aws": [
+"Amazon Data Firehose (formerly Amazon Kinesis Data Firehose)",
+"Amazon Kinesis Data Streams",
+"Amazon Managed Streaming for Apache Kafka"
+],
+"azure": [
+"Event Hubs"
+],
+"gcp": [
+"Dataflow",
+"Pub/Sub",
+"Dataflow Prime"
+],
+"info": "Managed service to provide a scalable and durable capability for ingesting and consuming high-volume data streams in real-time."
+},
+{
+"category": "Integration",
+"service": "Queue Messaging",
+"oci": [
+"Queue"
+],
+"aws": [
+"Amazon MQ",
+"Amazon Simple Queue Service"
+],
+"azure": [
+"Queue Storage"
+],
+"gcp": [
+"Cloud Tasks"
+],
+"info": "Managed service to provide a messaging queue that decouples sources and targets."
+},
+{
+"category": "Management and Governance",
+"service": "Other-Management and Governance",
+"oci": [
+"Java Management Free"
+],
+"aws": [
+"Customer Carbon Footprint Tool"
+],
+"azure": [
+"Storage Explorer"
+],
+"gcp": [
+"Carbon Footprint"
+],
+"info": "Management services that are not covered elsewhere."
+},
+{
+"category": "Management and Governance",
+"service": "Professional Services",
+"oci": [
+"Oracle Advanced Customer Services"
+],
+"aws": [
+"AWS Managed Services"
+],
+"azure": [],
+"gcp": [],
+"info": "Expert knowledge, guidance, and assistance from professionals employed by the cloud vendor."
+},
+{
+"category": "Management and Governance",
+"service": "Console",
+"oci": [
+"Console Dashboards",
+"Mobile App"
+],
+"aws": [
+"AWS Console Mobile Application",
+"AWS Management Console"
+],
+"azure": [
+"Azure mobile app",
+"Microsoft Azure portal"
+],
+"gcp": [
+"Cloud Mobile App",
+"Cloud Console"
+],
+"info": "Web or mobile-based interface to view and manage resources in the cloud."
+},
+{
+"category": "Management and Governance",
+"service": "Resource Consumption and Availability",
+"oci": [
+"OCI Control Center"
+],
+"aws": [],
+"azure": [],
+"gcp": [],
+"info": "Measure and report on overall availability and consumption of resources."
+},
+{
+"category": "Management and Governance",
+"service": "License Management",
+"oci": [
+"License Manager Free"
+],
+"aws": [
+"AWS License Manager"
+],
+"azure": [],
+"gcp": [],
+"info": "Service to monitor and maintain compliance with licensing agreements."
+},
+{
+"category": "Management and Governance",
+"service": "Logging Analysis",
+"oci": [
+"Logging Analytics Free Tier"
+],
+"aws": [
+"Amazon CloudWatch",
+"Amazon Managed Service for Grafana"
+],
+"azure": [
+"Azure Managed Grafana",
+"Azure Monitor"
+],
+"gcp": [
+"Log Analytics",
+"Cloud Audit Logs"
+],
+"info": "Service to index, enrich, aggregate, explore, search, analyze, correlate, visualize, and monitor log data from applications and cloud infrastructure."
+},
+{
+"category": "Management and Governance",
+"service": "Metadata Tagging",
+"oci": [
+"Tagging"
+],
+"aws": [
+"Tags"
+],
+"azure": [
+"Tags"
+],
+"gcp": [
+"Labels"
+],
+"info": "Capability of adding metadata to resources in key-value format for organizational and management needs."
+},
+{
+"category": "Management and Governance",
+"service": "Multifactor Authentication",
+"oci": [
+"Multifactor Authentication"
+],
+"aws": [
+"Multi-factor Authentication"
+],
+"azure": [
+"Azure AD Multi-Factor Authentication"
+],
+"gcp": [
+"reCAPTCHA Multi-factor Authentication [Pre-GA]",
+"Multi-factor Authentication",
+"Titan Security Key",
+"Advanced Protection Program"
+],
+"info": "Capability to leverage multi-factor authentication with the cloud infrastructure identity and authorization service."
+},
+{
+"category": "Management and Governance",
+"service": "Multiple Account Management",
+"oci": [
+"Organization Management Free"
+],
+"aws": [
+"AWS Control Tower",
+"AWS Organizations",
+"AWS Resource Access Manager"
+],
+"azure": [
+"Azure Management Group"
+],
+"gcp": [
+"Resource Manager"
+],
+"info": "Capability to administrate multiple, initially separate, accounts within a single organizational grouping."
+},
+{
+"category": "Management and Governance",
+"service": "Network Management",
+"oci": [
+"Network Path Analyzer"
+],
+"aws": [
+"IP Address Management"
+],
+"azure": [
+"Azure Virtual Network Manager"
+],
+"gcp": [
+"Network Analyzer",
+"Network Connectivity Center",
+"VPC Service Controls"
+],
+"info": "Service to centrally manage multiple, virtual networks in a consolidated view, preferably in a GUI."
+},
+{
+"category": "Management and Governance",
+"service": "Application Monitoring",
+"oci": [
+"Stack Monitoring",
+"Application Performance Monitoring Free Tier"
+],
+"aws": [
+"Amazon DevOps Guru",
+"AWS Distro for OpenTelemetry",
+"AWS Resilience Hub"
+],
+"azure": [
+"Application Insights"
+],
+"gcp": [
+"Firebase Crashlytics",
+"Firebase Performance Monitroing",
+"Anthos Service Mesh",
+"Error Reporting"
+],
+"info": "Managed service to provide monitoring of applications and their performance."
+},
+{
+"category": "Management and Governance",
+"service": "Architecture Guidance",
+"oci": [
+"Oracle Cloud Infrastructure Architecture Center"
+],
+"aws": [
+"AWS Well-Architected Tool"
+],
+"azure": [
+"Azure Architecture Center"
+],
+"gcp": [
+"Solutions",
+"Cloud Foundation Toolkit"
+],
+"info": "A resource archive to enable developers and IT staff to optimize and customize their cloud, hybrid, and on-premises configurations leveraging reference architectures, quick-start guides, and more."
+},
+{
+"category": "Management and Governance",
+"service": "Cloud and Service Monitoring",
+"oci": [
+"Pulse",
+"Health Checks",
+"Monitoring Free",
+"Oracle Management Cloud [deprecated]"
+],
+"aws": [
+"AWS Personal Health Dashboard"
+],
+"azure": [
+"Azure Service Health"
+],
+"gcp": [
+"Cloud Monitoring",
+"Google Cloud Managed Service for Prometheus"
+],
+"info": "Service to monitor the services provided by a cloud vendor."
+},
+{
+"category": "Management and Governance",
+"service": "Cost Optimization",
+"oci": [
+"Cost Estimator Free",
+"Oracle Support Rewards",
+"Budgets Free",
+"Cost Analysis Free",
+"Operations Insights Free Tier",
+"OCI FinOps Hub New"
+],
+"aws": [
+"Cost Optimization Hub",
+"AWS Budgets",
+"AWS Cost & Usage Report",
+"AWS Cost Explorer",
+"Reserved Instance Reporting",
+"Savings Plans"
+],
+"azure": [
+"Microsoft Cost Management"
+],
+"gcp": [
+"Cost Management"
+],
+"info": "Service that manages, limits, and controls spending on cloud resources based on utilization and forecast analysis."
+},
+{
+"category": "Management and Governance",
+"service": "Host Monitoring",
+"oci": [
+"Management Agent"
+],
+"aws": [
+"CloudWatch"
+],
+"azure": [
+"Azure Monitor"
+],
+"gcp": [
+"Cloud Monitoring"
+],
+"info": "Service to provide interactive communication and data collection from resources, such as virtual machines."
+},
+{
+"category": "Management and Governance",
+"service": "Network Monitoring",
+"oci": [
+"Virtual Test Access Points",
+"Inter-Region Latency",
+"Devops Monitoring",
+"Network Visualizer"
+],
+"aws": [
+"Amazon CloudWatch",
+"AWS Traffic Mirroring"
+],
+"azure": [
+"Network Watcher"
+],
+"gcp": [
+"Network Intelligence Center",
+"Network Telementry",
+"Packet Mirroring"
+],
+"info": "Service to monitor and diagnose issues with networking, potentially with visualization."
+},
+{
+"category": "Management and Governance",
+"service": "OS Management",
+"oci": [
+"OS Management Free"
+],
+"aws": [
+"AWS Systems Manager Patch Manager"
+],
+"azure": [
+"Automation Update Management"
+],
+"gcp": [
+"VM Manager"
+],
+"info": "Service to manage and monitor updates and patches for operating systems."
+},
+{
+"category": "Management and Governance",
+"service": "Resource Configuration Management and Monitoring",
+"oci": [
+"Drift Detection"
+],
+"aws": [
+"AWS Config"
+],
+"azure": [],
+"gcp": [
+"Network Analyzer"
+],
+"info": "Managed service to assess, audit, and evaluate the configurations of resources."
+},
+{
+"category": "Management and Governance",
+"service": "Service Logging",
+"oci": [
+"Audit Free",
+"Logging Free Tier",
+"Automatic Workload Repository (AWR) Hub"
+],
+"aws": [
+"Amazon CloudWatch",
+"AWS CloudTrail"
+],
+"azure": [
+"Azure Monitor"
+],
+"gcp": [
+"Cloud Logging",
+"Cloud Audit Logs"
+],
+"info": "Service to log activities from managed services"
+},
+{
+"category": "Management and Governance",
+"service": "Service Optimizer",
+"oci": [
+"Cloud Advisor Free"
+],
+"aws": [
+"AWS Trusted Advisor"
+],
+"azure": [
+"Azure Advisor"
+],
+"gcp": [
+"Recommender",
+"Cloud Trace"
+],
+"info": "Service to find potential inefficiencies and suggest guided solutions that can help maximize cost savings and improve security."
+},
+{
+"category": "Management and Governance",
+"service": "Resource Deployment",
+"oci": [
+"Resource Manager Free",
+"OCI Fleet Application Management LA"
+],
+"aws": [
+"AWS CloudFormation",
+"AWS OpsWorks"
+],
+"azure": [
+"Azure CycleCloud",
+"Azure DevTest Labs",
+"Azure Automanage",
+"Azure Blueprints [Preview]",
+"Azure Resource Manager",
+"Azure Resource Manager templates",
+"Azure Resource Mover"
+],
+"gcp": [
+"Google Cloud Deployment Manager",
+"Terraform on Google Cloud"
+],
+"info": "Managed service to automate deployment and operation of resources leveraging infrastructure-as-code."
+},
+{
+"category": "Management and Governance",
+"service": "Cloud Resource Management",
+"oci": [
+"Search"
+],
+"aws": [
+"AWS Resource Explorer",
+"AWS Config"
+],
+"azure": [
+"Azure Monitor"
+],
+"gcp": [
+"Cloud Asset Inventory"
+],
+"info": "Service to locate resources within a cloud environment."
+},
+{
+"category": "Marketplace",
+"service": "Curated Marketplace",
+"oci": [
+"Service Catalog"
+],
+"aws": [
+"AWS Service Catalog"
+],
+"azure": [
+"Azure Managed Applications"
+],
+"gcp": [
+"Private Catalog",
+"Private Marketplace [Pre-GA]"
+],
+"info": "A catalog of approved applications, images, or stacks for use in your account."
+},
+{
+"category": "Marketplace",
+"service": "Application and Platform Marketplace",
+"oci": [
+"Marketplace",
+"Publisher"
+],
+"aws": [
+"Private Offers",
+"Amazon Marketplace"
+],
+"azure": [
+"Azure Marketplace"
+],
+"gcp": [
+"Google Cloud Marketplace"
+],
+"info": "An online storefor images or stack that can be deployed in the cloud vendor's infrastructure. This can include offers extended exclusively to select customers."
+},
+{
+"category": "Media",
+"service": "Media Distribution",
+"oci": [
+"Media Streams"
+],
+"aws": [
+"Amazon Interactive Video Service",
+"AWS Elemental MediaPackage"
+],
+"azure": [
+"Azure Media Player",
+"Content Protection",
+"Live and On-Demand Streaming",
+"Media Services"
+],
+"gcp": [],
+"info": "Service to stream live content to multiple devices and platforms."
+},
+{
+"category": "Media",
+"service": "Media Enhancement",
+"oci": [
+"Media Flow"
+],
+"aws": [
+"Amazon Elastic Transcoder",
+"Amazon Nimble Studio",
+"AWS Elemental MediaConvert",
+"AWS Elemental MediaLive",
+"AWS Elemental MediaTailor"
+],
+"azure": [
+"Encoding"
+],
+"gcp": [
+"Transcoder API"
+],
+"info": "Managed service that provides conversion, transcoding, and other manipulation of media content."
+},
+{
+"category": "Migration",
+"service": "Database Data Replication",
+"oci": [
+"GoldenGate"
+],
+"aws": [
+"CloudEndure Disaster Recovery"
+],
+"azure": [],
+"gcp": [
+"Datastream",
+"Bigtable change streams (preview)",
+"Datastream for BigQuery"
+],
+"info": "Managed service to move data in real-time between two data management systems."
+},
+{
+"category": "Migration",
+"service": "Database Migration",
+"oci": [
+"Zero Downtime Migration",
+"Database Migration Service Free"
+],
+"aws": [
+"AWS Data Migration Service Serverless",
+"AWS Database Migration Service"
+],
+"azure": [
+"Azure Database Migration Service"
+],
+"gcp": [
+"Database Migration Service"
+],
+"info": "Managed service to migrate databases between platforms."
+},
+{
+"category": "Migration",
+"service": "Resource Migration",
+"oci": [
+"Oracle Cloud Migrations"
+],
+"aws": [
+"AWS Application Migration Service (aka CloudEndure)"
+],
+"azure": [
+"Azure Migrate"
+],
+"gcp": [
+"Migrate for Compute Engine"
+],
+"info": "Managed service to migrate resources from on-premises to the cloud vendor, typically for virtual machines."
+},
+{
+"category": "Network and Connectivity",
+"service": "Network Routing",
+"oci": [
+"Dynamic Routing Gateway Free"
+],
+"aws": [
+"AWS Transit Gateway"
+],
+"azure": [
+"Azure Route Server"
+],
+"gcp": [
+"Cloud Router"
+],
+"info": "Managed service to provide a routing gateway to connect virtual networks, remote peering connections, IPSec tunnels, and dedicated connections."
+},
+{
+"category": "Network and Connectivity",
+"service": "Application and Service Routing",
+"oci": [
+"Service Mesh Free",
+"Service Connector Hub Free"
+],
+"aws": [
+"AWS App Mesh",
+"Amazon VPC Lattice"
+],
+"azure": [
+"Azure Service Fabric"
+],
+"gcp": [
+"Traffic Director"
+],
+"info": "Managed service to connect multiple services together to form an application along with end-to-end monitoring. Connections are more than just event notifications."
+},
+{
+"category": "Network and Connectivity",
+"service": "Network Address Translation (NAT)",
+"oci": [
+"NAT Gateway Free"
+],
+"aws": [
+"NAT gateways"
+],
+"azure": [
+"NAT Gateway"
+],
+"gcp": [
+"Cloud NAT"
+],
+"info": "Managed service to provide resource without public IP addresses access to the internet without exposing those resources to incoming internet connections."
+},
+{
+"category": "Network and Connectivity",
+"service": "Layer 4 Load Balancing",
+"oci": [
+"Network Load Balancer Free"
+],
+"aws": [
+"Network Load Balancer"
+],
+"azure": [
+"Azure Load Balancer"
+],
+"gcp": [
+"Cloud Load Balancing"
+],
+"info": "Managed service to provide automated traffic distribution from one entry point to multiple backend destinations over layer 3/4 (IP protocol)."
+},
+{
+"category": "Network and Connectivity",
+"service": "Public DNS",
+"oci": [
+"Traffic Management",
+"DNS"
+],
+"aws": [
+"Amazon Route 53"
+],
+"azure": [
+"Azure DNS",
+"Azure Traffic Manager"
+],
+"gcp": [
+"Cloud DNS"
+],
+"info": "Managed service to provide DNS (domain name service) capability, available from the internet, with multiple routing options."
+},
+{
+"category": "Network and Connectivity",
+"service": "Internet Gateway",
+"oci": [
+"Internet Gateway"
+],
+"aws": [
+"Internet Gateway"
+],
+"azure": [],
+"gcp": [],
+"info": "Capability that provides networking access to the public internet"
+},
+{
+"category": "Network and Connectivity",
+"service": "Public IP Address",
+"oci": [
+"Public IP Address"
+],
+"aws": [
+"Elastic IP Address"
+],
+"azure": [
+"Public IP Address"
+],
+"gcp": [
+"IP Addresses"
+],
+"info": "Service that provides a public, routable, IP address"
+},
+{
+"category": "Network and Connectivity",
+"service": "HTTP Acceleration",
+"oci": [
+"Web Application Acceleration"
+],
+"aws": [],
+"azure": [],
+"gcp": [],
+"info": "Caching and acceleration of HTTP-based communication"
+},
+{
+"category": "Network and Connectivity",
+"service": "Private DNS",
+"oci": [
+"Private DNS"
+],
+"aws": [
+"Amazon Route 53 Resolver",
+"Private Hosted Zones"
+],
+"azure": [
+"Azure Private DNS"
+],
+"gcp": [
+"Cloud DNS (private managed zone)"
+],
+"info": "Managed service to provide DNS (domain name service) capability internally to virtual networks within the cloud environment"
+},
+{
+"category": "Network and Connectivity",
+"service": "Cross-region network peering",
+"oci": [
+"Remote VCN Peering"
+],
+"aws": [
+"Inter-Region VPC Peering"
+],
+"azure": [
+"Global Virtual Network Peering"
+],
+"gcp": [],
+"info": "Logical connection between virtual networks in different regions"
+},
+{
+"category": "Network and Connectivity",
+"service": "Virtual Network Card",
+"oci": [
+"Virtual Network Interface Cards"
+],
+"aws": [
+"Elastic Network Interfaces"
+],
+"azure": [
+"Network Interface"
+],
+"gcp": [
+"Google Virtual NIC"
+],
+"info": "Virtualized network interface (VNIC) for compute instances"
+},
+{
+"category": "Network and Connectivity",
+"service": "Same-region network peering",
+"oci": [
+"Local VCN Peering"
+],
+"aws": [
+"VPC Peering"
+],
+"azure": [
+"Virtual network peering"
+],
+"gcp": [
+"VPC Network Peering",
+"VPC spokes"
+],
+"info": "Logical connection between virtual networks in the same region"
+},
+{
+"category": "Network and Connectivity",
+"service": "BYOIP",
+"oci": [
+"Bring Your Own IP"
+],
+"aws": [
+"Bring your own IP addresses"
+],
+"azure": [
+"Bring your own IP addresses"
+],
+"gcp": [
+"Bring your own IP"
+],
+"info": "Bring-your-own-IP to use customer-owned IP addresses"
+},
+{
+"category": "Network and Connectivity",
+"service": "Dedicated Connection",
+"oci": [
+"Azure Interconnect",
+"FastConnect"
+],
+"aws": [
+"AWS Direct Connect"
+],
+"azure": [
+"Azure ExpressRoute"
+],
+"gcp": [
+"Partner Interconnect",
+"Cross-Cloud Interconnect",
+"Dedicated Interconnect"
+],
+"info": "Private, high-bandwidth connection between a customer and the cloud vendor."
+},
+{
+"category": "Network and Connectivity",
+"service": "Layer 7 Load Balancing",
+"oci": [
+"Load Balancing Free Tier"
+],
+"aws": [
+"Application Load Balancer"
+],
+"azure": [
+"Azure Application Gateway"
+],
+"gcp": [
+"Cloud Load Balancing"
+],
+"info": "Managed service to provide auomated traffic distribution from one entry point to multiple backends over layer 7 (HTTP protocol), with optional URL routing."
+},
+{
+"category": "Network and Connectivity",
+"service": "Network Appliance Load Balancing",
+"oci": [
+"Network Load Balancer Free"
+],
+"aws": [
+"Gateway Load Balancer"
+],
+"azure": [
+"Azure Gateway Load Balance"
+],
+"gcp": [],
+"info": "Managed service to provide automated traffic routing to third-party appliances."
+},
+{
+"category": "Network and Connectivity",
+"service": "Network QoS",
+"oci": [
+"OCI Global Network"
+],
+"aws": [
+"AWS Global Accelerator"
+],
+"azure": [
+"Azure Internet Analyzer [Retired]"
+],
+"gcp": [
+"Network Service Tiers"
+],
+"info": "Service to provide accelerated or high-priority service to network data."
+},
+{
+"category": "Network and Connectivity",
+"service": "Private Connectivity",
+"oci": [
+"Private Access (Service Gateway) Free"
+],
+"aws": [
+"AWS PrivateLink"
+],
+"azure": [
+"Azure Private Link"
+],
+"gcp": [
+"Private Service Connect"
+],
+"info": "Service that provides connectivity between two resources or endpoints that does not go over the internet."
+},
+{
+"category": "Network and Connectivity",
+"service": "Virtual Network",
+"oci": [
+"IP Address",
+"Site-to-Site Virtual Private Network",
+"Virtual Cloud Network Free Tier"
+],
+"aws": [
+"AWS VPC",
+"AWS VPN"
+],
+"azure": [
+"Virtual Network",
+"VPN Gateway"
+],
+"gcp": [
+"Virtual Private Cloud",
+"Cloud VPN"
+],
+"info": "Managed service that provides customizable and private cloud networks, including IP address spaces, subnets, route tables, and stateful firewalls."
+},
+{
+"category": "Security",
+"service": "Application Firewall",
+"oci": [
+"OCI Web Application Firewall (WAF) Free Tier"
+],
+"aws": [
+"AWS Web Application Firewall"
+],
+"azure": [
+"Web Application Firewall"
+],
+"gcp": [
+"Cloud Armor",
+"Apigee Sense"
+],
+"info": "Managed service to help protect applications from malicious and unwanted internet traffic."
+},
+{
+"category": "Security",
+"service": "Certificate Management",
+"oci": [
+"Certificates Free"
+],
+"aws": [
+"AWS Certificate Manager",
+"AWS Private Certificate Authority"
+],
+"azure": [
+"Azure App Service",
+"Azure Key Vault"
+],
+"gcp": [
+"Certificate Authority Service",
+"Cloud Certificate Manager"
+],
+"info": "Managed service to create and manage certificate authorities (CAs) and certificates."
+},
+{
+"category": "Security",
+"service": "DDoS Protection",
+"oci": [
+"OCI Web Application Firewall (WAF)",
+"Layer 3/4 DDoS Protection"
+],
+"aws": [
+"AWS Shield"
+],
+"azure": [
+"Azure DDoS Network Protection",
+"Azure DDoS IP Protection"
+],
+"gcp": [
+"Cloud Armor"
+],
+"info": "Managed service to provide protection against distributed denial of service (DDoS) attacks."
+},
+{
+"category": "Security",
+"service": "Vulnerability and Threat Activity Scanning",
+"oci": [
+"Threat Detector"
+],
+"aws": [
+"Amazon GuardDuty"
+],
+"azure": [
+"Microsoft Defender for Cloud"
+],
+"gcp": [
+"Chronicle Security Operations",
+"Cloud IDS",
+"Security Command Center"
+],
+"info": "Service that monitors a customer's cloud environment for activity from known threats, such as viruses, malware, cryptomining, etc."
+},
+{
+"category": "Security",
+"service": "Dependency Audit",
+"oci": [
+"Application Dependency Management"
+],
+"aws": [
+"Amazon Inspector"
+],
+"azure": [],
+"gcp": [],
+"info": "Service that reviews the dependencies of an application for known vulnerabilities, typically from the National Vulnerability Database"
+},
+{
+"category": "Security",
+"service": "External User Management",
+"oci": [
+"Identity and Access Management with Domains Free"
+],
+"aws": [
+"Amazon Cognito"
+],
+"azure": [
+"Microsoft Entra External ID (Azure Active Directory External Identities)",
+"Azure Lighthouse"
+],
+"gcp": [
+"Firebase Authentication",
+"Identity Platform"
+],
+"info": "Managed service to provide sign-up, sign-in, and access control to web and mobile applications, optionally supporting third-party providers and enterprise identity providers via industry standard protocols."
+},
+{
+"category": "Security",
+"service": "Identity Management",
+"oci": [
+"Identity and Access Management (IAM) Free"
+],
+"aws": [
+"AWS Security Token Service API",
+"AWS Identity and Access Management",
+"AWS Verified Access"
+],
+"azure": [
+"Micrisoft Entra ID (Azure Active Directory)"
+],
+"gcp": [
+"Firebase Authentication",
+"BeyondCorp Enterprise",
+"Identity and Access Management"
+],
+"info": "Managed service to provide identity and access management features, such as authentication, single sign-on (SSO), and identity lifecycle management, whether for software-as-a-service (SaaS), in the cloud, or on-premises."
+},
+{
+"category": "Security",
+"service": "Compute Security Posture Scanning",
+"oci": [
+"Vulnerability Scanning Free"
+],
+"aws": [
+"Amazon Inspector"
+],
+"azure": [
+"Microsoft Defender for Cloud"
+],
+"gcp": [
+"Security Command Center"
+],
+"info": "Service to scan for open ports, out-dated packages, and other security posture concerns."
+},
+{
+"category": "Security",
+"service": "Compute-based Firewall Rules",
+"oci": [
+"Network Security Groups"
+],
+"aws": [
+"Security Groups"
+],
+"azure": [
+"Application Security Groups"
+],
+"gcp": [],
+"info": "Firewall rules that affect specifically assigned compute resources"
+},
+{
+"category": "Security",
+"service": "API Abuse Protection",
+"oci": [
+"Web Application Firewall (WAF)"
+],
+"aws": [
+"AWS Web Application Firewall"
+],
+"azure": [],
+"gcp": [
+"Advanced API Security"
+],
+"info": "Managed service to help protect public API endpoints from fraudulent activity, spam, bots, and abuse."
+},
+{
+"category": "Security",
+"service": "Network-level Firewall Rules",
+"oci": [
+"Security Lists"
+],
+"aws": [
+"Network ACLs"
+],
+"azure": [
+"Network Security Groups"
+],
+"gcp": [
+"VPC Firewall Rules"
+],
+"info": "Firewall rules that affect all compute and services in a virtual network"
+},
+{
+"category": "Security",
+"service": "Temporary Operator Access",
+"oci": [
+"Managed Access"
+],
+"aws": [],
+"azure": [],
+"gcp": [],
+"info": "Create and manage temporary credentials for authorized operator access to your environment"
+},
+{
+"category": "Security",
+"service": "Enterprise Firewall",
+"oci": [
+"Network Firewall"
+],
+"aws": [
+"AWS Network Firewall"
+],
+"azure": [
+"Azure Firewall Basic",
+"Azure Firewall"
+],
+"gcp": [
+"Firewalls"
+],
+"info": "Inter- and intra-cloud network firewall with highly configurable rules."
+},
+{
+"category": "Security",
+"service": "Vulnerabilities and Threat Indicators",
+"oci": [
+"Threat Intelligence Free"
+],
+"aws": [],
+"azure": [
+"Microsoft Sentinel"
+],
+"gcp": [
+"Security Command Center"
+],
+"info": "Service that provides information about known threat indicators, including suspicious IP addresses, domain names, and other digital fingerprints."
+},
+{
+"category": "Security",
+"service": "Layer 7 Abuse Prevention",
+"oci": [
+"OCI Web Application Firewall (WAF) Free Tier"
+],
+"aws": [
+"AWS WAF Captcha"
+],
+"azure": [
+"Microsoft Dynamics Fraud"
+],
+"gcp": [
+"reCAPTCHA Enterprise"
+],
+"info": "Managed service to help protect websites from fraudulent activity, spam, bots, and abuse."
+},
+{
+"category": "Security",
+"service": "Authentication and Authorization",
+"oci": [
+"Identity and Access Management (IAM) Free"
+],
+"aws": [
+"AWS Directory Service",
+"AWS Single Sign-On"
+],
+"azure": [
+"Microsoft Entra ID (Azure Active Directory)"
+],
+"gcp": [
+"Cloud Identity",
+"Managed Service for Microsoft Active Directory",
+"Identity and Access Management",
+"Identity Platform"
+],
+"info": "Managed service to provide secure access to enterprise applications for both in the cloud and on-premises."
+},
+{
+"category": "Security",
+"service": "Cloud Provider Access Management",
+"oci": [
+"Oracle Operator Access Control"
+],
+"aws": [
+"Amazon Managed Services Operator Access"
+],
+"azure": [
+"Customer Lockbox"
+],
+"gcp": [
+"Access Transparency"
+],
+"info": "Service to grant, audit, and revoke cloud vendor access to certain resources and data within a customer's cloud environment."
+},
+{
+"category": "Security",
+"service": "Encryption Key Management",
+"oci": [
+"Vault Free Tier",
+"External Key Management",
+"OCI Dedicated Key Management Service"
+],
+"aws": [
+"AWS CloudHSM",
+"AWS Key Management Service",
+"AWS Key Management Service External Key Store"
+],
+"azure": [
+"Azure Dedicated HSM",
+"Azure Key Vault"
+],
+"gcp": [
+"Cloud Key Management",
+"Cloud HSM"
+],
+"info": "Managed service to centrally manage the encryption keys that protect customer data and resources."
+},
+{
+"category": "Security",
+"service": "Proof of Compliance",
+"oci": [
+"Compliance Documents"
+],
+"aws": [
+"AWS Artifact"
+],
+"azure": [
+"Azure Compliance Center"
+],
+"gcp": [
+"Compliance Reports Manager"
+],
+"info": "Service to view and download documents and reports for compliance-related information."
+},
+{
+"category": "Security",
+"service": "Remote Access",
+"oci": [
+"Bastion Free"
+],
+"aws": [
+"AWS EC2 Instance Connect",
+"AWS Systems Manager Session Manager"
+],
+"azure": [
+"Azure Bastion"
+],
+"gcp": [
+"OS Login",
+"SSH From the Browser"
+],
+"info": "Managed service to provide restricted and time-limited access to target resources that do not have public endpoints."
+},
+{
+"category": "Security",
+"service": "Risk and Compliance Management",
+"oci": [
+"OCI Cloud Guard Free"
+],
+"aws": [
+"AWS Audit Manager"
+],
+"azure": [
+"Microsoft Purview Compliance Manager",
+"Azure Blueprints [preview]",
+"Microsoft Azure Attestation"
+],
+"gcp": [
+"Assured Workloads",
+"Risk Protection Program [Preview]"
+],
+"info": "Service to assess risk and compliance with regulations and industry standards based on resource usage."
+},
+{
+"category": "Security",
+"service": "Secrets Management",
+"oci": [
+"Secrets Management with OCI Vault Free"
+],
+"aws": [
+"AWS Secrets Manager"
+],
+"azure": [
+"Azure Key Vault secrets"
+],
+"gcp": [
+"Secret Manager"
+],
+"info": "Managed service to manage, retrieve, and rotate credentials, API keys, and other secrets."
+},
+{
+"category": "Security",
+"service": "Security Monitoring, Assessment, and Advice",
+"oci": [
+"Access Governance",
+"Cloud Guard Free",
+"Security Advisor"
+],
+"aws": [
+"Amazon Security Lake",
+"Amazon Detective",
+"AWS Security Hub"
+],
+"azure": [
+"Microsoft Sentinel"
+],
+"gcp": [
+"Cloud Armor",
+"Chronicle",
+"Security center",
+"Security Command Center"
+],
+"info": "Managed service to monitor, identify, achieve, and maintain a strong security posture. Service examines resources for security weaknesses and operators and users for risky activities. Service can optionally suggest, assist, or take corrective actions."
+},
+{
+"category": "Security",
+"service": "Security Policy Enforcement",
+"oci": [
+"Security Zones Free"
+],
+"aws": [
+"AWS IAM Access Analyzer"
+],
+"azure": [
+"Azure Policy"
+],
+"gcp": [
+"Container Security",
+"Policy Intelligence"
+],
+"info": "Service to ensure compute, networking, object storage, and database resources comply with security principles."
+},
+{
+"category": "Security",
+"service": "Sensitive Data Identification",
+"oci": [
+"Data Safe Free"
+],
+"aws": [
+"Amazon Macie"
+],
+"azure": [
+"Azure Information Protection"
+],
+"gcp": [
+"Cloud Data Loss Prevention"
+],
+"info": "Service that can help evaluate data risk, mask sensitive data, and implement security controls."
+},
+{
+"category": "Storage",
+"service": "File Storage",
+"oci": [
+"File Storage"
+],
+"aws": [
+"Mountpoint for Amazon S3",
+"Amazon Elastic File System",
+"Amazon FSx for OpenZFS",
+"Amazon FSx for Lustre",
+"Amazon FSx for NetApp ONTAP",
+"Amazon FSx for Windows File Server"
+],
+"azure": [
+"Azure Managed Lustre",
+"Avere FXT Edge Filer",
+"Avere vFXT for Azure",
+"Azure Files",
+"Azure HPC Cache",
+"Azure NetApp Files"
+],
+"gcp": [
+"Filestore",
+"Filestore Multishares for GKE"
+],
+"info": "Managed network file system to provide scalable, distributed, enterprise-grade storage. Typically supports NFS."
+},
+{
+"category": "Storage",
+"service": "Object Storage",
+"oci": [
+"Object Storage Free Tier"
+],
+"aws": [
+"Amazon S3 Intelligent-Tiering",
+"Amazon S3 One Zone-IA",
+"Amazon S3 Standard-IA",
+"Amazon Simple Storage Service"
+],
+"azure": [
+"Azure Blob Storage"
+],
+"gcp": [
+"Cloud Storage",
+"Cloud Storage for Firebase"
+],
+"info": "Internet-scale, high-performance storage platform that provides reliable and cost-efficient data storage. Object Storage can provide unlimited storage for any content type."
+},
+{
+"category": "Storage",
+"service": "Database Backup",
+"oci": [
+"Zero Data Loss Autonomous Recovery Service",
+"Database Autonomous Recovery"
+],
+"aws": [],
+"azure": [],
+"gcp": [],
+"info": "Managed service to automate database backups"
+},
+{
+"category": "Storage",
+"service": "Block Storage",
+"oci": [
+"Block Volume Free Tier"
+],
+"aws": [
+"Amazon Elastic Block Store"
+],
+"azure": [
+"Azure Disk Storage"
+],
+"gcp": [
+"Local SSD",
+"Persistent Disk",
+"Google Cloud Hyperdisk"
+],
+"info": "High-performance, network storage capacity that supports a broad range fo I/O intensive workloads."
+},
+{
+"category": "Storage",
+"service": "Cold Object Storage",
+"oci": [
+"Archive Storage Free Tier"
+],
+"aws": [
+"Amazon S3 Glacier Flexible Retrieval",
+"Amazon S3 Glacier Deep Archive",
+"Amazon S3 Glacier Instant Retrieval"
+],
+"azure": [
+"Archive Storage"
+],
+"gcp": [
+"Cloud Storage Archive"
+],
+"info": "Object storage that is access infrequently and requires a longer retention time."
+},
+{
+"category": "Storage",
+"service": "Data Transfer",
+"oci": [
+"Data Transfer"
+],
+"aws": [
+"AWS DataSync Discovery",
+"AWS Snow Family",
+"AWS DataSync",
+"AWS Transfer Family"
+],
+"azure": [
+"Data Box"
+],
+"gcp": [
+"Transfer Appliance",
+"Storage Transfer Service"
+],
+"info": "Service to migrate data into the cloud using a device. The service can also migrate data off of the cloud."
+}
+]

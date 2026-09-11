@@ -45,6 +45,7 @@ import { listNetworkingOptions, calculateNetworkingCost, compareDataEgress } fro
 import { listKubernetesOptions, calculateKubernetesCost, compareKubernetesProviders } from './tools/kubernetes.js';
 import { listMulticloudDatabases, getMulticloudAvailabilityMatrix, calculateMulticloudDatabaseCost, compareMulticloudVsOCI } from './tools/multicloud.js';
 import { getCloudInstancePrice, compareVmOciVsCloud } from './tools/vantage.js';
+import { mapCloudServices } from './tools/servicemap.js';
 import {
   listAIMLServices,
   listObservabilityServices,
@@ -840,11 +841,27 @@ const TOOLS = [
       required: ['provider', 'instanceType'],
     },
   },
+  {
+    name: 'map_cloud_services',
+    description: 'Cross-cloud service de-para: find equivalent OCI/AWS/Azure/GCP service names (160 services, 20 categories). No args lists categories.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        query: { type: 'string', description: 'Match any service name across clouds, e.g. "bedrock", "lambda", "s3"' },
+        category: { type: 'string', description: 'Filter by category, e.g. "Compute", "Security", "Data Management"' },
+      },
+    },
+  },
 ];
 
-// Tools that reach out to Oracle's live pricing API. Everything else reads
-// bundled data only. Used to set MCP `openWorldHint`.
-const OPEN_WORLD_TOOLS = new Set(['fetch_realtime_pricing', 'list_realtime_categories']);
+// Tools that reach out over the network (Oracle live pricing API, or the Vantage
+// instances MCP). Everything else reads bundled data only. Sets `openWorldHint`.
+const OPEN_WORLD_TOOLS = new Set([
+  'fetch_realtime_pricing',
+  'list_realtime_categories',
+  'get_cloud_instance_price',
+  'compare_vm_oci_vs_cloud',
+]);
 
 // Handle list tools request. Every tool here is read-only (none mutate state),
 // so we attach `readOnlyHint` to all and `openWorldHint` only to the two that
@@ -1069,6 +1086,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         break;
       case 'compare_vm_oci_vs_cloud':
         result = await compareVmOciVsCloud(typedArgs);
+        break;
+      case 'map_cloud_services':
+        result = mapCloudServices(typedArgs);
         break;
 
       default:

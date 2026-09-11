@@ -15,6 +15,8 @@ A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server that p
 - **Windows licensing.** `calculate_monthly_cost` accepts `os: "windows"` (adds the `B88318` Windows OS license, $0.092/OCPU/hr) and `burstBaseline` (reduces the billed license OCPUs for burstable shapes).
 - **Paid-by-default free-tier policy.** Estimates use **100% paid SKUs**. Always Free is applied **only** to network egress (≤10 TB/month), public IPs, and VCN — never to compute, storage, databases, load balancers, or other managed services. (Also fixed an upstream accounting bug where free egress created a phantom credit that zeroed out unrelated paid items like the load balancer.)
 - **`convert_usd_brl` tool.** Converts USD to BRL grossing up Brazilian tax: `BRL = USD × fxRate ÷ taxDivisor` (defaults `5.23` / `0.87`, overridable via env `OCI_FX_BRL` / `OCI_TAX_DIVISOR` or per call).
+- **Live multicloud compute.** `get_cloud_instance_price` and `compare_vm_oci_vs_cloud` pull **live** AWS/Azure/GCP instance pricing by proxying the public [Vantage instances MCP](https://instances.vantage.sh) (per-instance, avoids the unusable ~316 MB raw dumps). `compare_vm_oci_vs_cloud` applies the **OCPU↔vCPU de-para** (1 OCPU = 2 vCPU, RAM 1:1) against the OCI E5 shape. Endpoint overridable via env `VANTAGE_MCP_URL`. This replaces the old hardcoded competitor constants for compute — egress/k8s comparisons remain approximate.
+- **Cross-cloud service de-para.** `map_cloud_services` looks up equivalent OCI/AWS/Azure/GCP service names across 160 services / 20 categories (bundled from Oracle's public mapping table).
 
 ## Why This Exists
 
@@ -158,6 +160,23 @@ claude mcp add oci-pricing -- node /path/to/oci-pricing-mcp-br/dist/index.js
 | `list_kubernetes_options` | OKE cluster options (Basic is FREE) |
 | `calculate_kubernetes_cost` | Calculate cluster cost |
 | `compare_kubernetes_providers` | Compare OKE vs EKS/AKS/GKE |
+
+### Multicloud Compute Tools (live, via Vantage)
+
+| Tool | Description |
+|------|-------------|
+| `get_cloud_instance_price` | Live On-Demand price + specs for an AWS/Azure/GCP instance type, by region |
+| `compare_vm_oci_vs_cloud` | Compare a cloud VM vs the equivalent OCI E5 shape, with OCPU↔vCPU de-para (1 OCPU = 2 vCPU) |
+
+Example — `t3.medium` in São Paulo vs OCI: `$49.06/mo` (AWS) vs `$27.74/mo` (OCI 1 OCPU / 4 GB) → OCI ~77% cheaper. Cloud price is On-Demand Linux; add Savings Plans/Reserved for committed discounts. Provider defaults: `us-east-1` / `eastus` / `us-central1`.
+
+### Cross-Cloud Service Mapping
+
+| Tool | Description |
+|------|-------------|
+| `map_cloud_services` | Find equivalent OCI/AWS/Azure/GCP service names (160 services, 20 categories). Filter by `query` or `category`; no args lists categories. |
+
+Each cloud field is a **list** of equivalent products (`[]` when a cloud has no equivalent). Example — `query: "bedrock"` → OCI `["Generative AI", "Generative AI Agents"]` = AWS `["Bedrock"]` = Azure `["OpenAI Service"]` = GCP `["Vertex AI Search and Conversation"]`. Name equivalence only; verify feature parity per provider.
 
 ### Service Category Tools
 
