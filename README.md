@@ -1,14 +1,20 @@
-# OCI Pricing MCP Server
+# OCI Pricing MCP Server — BR fork
 
-[![npm version](https://img.shields.io/npm/v/oci-pricing-mcp.svg)](https://www.npmjs.com/package/oci-pricing-mcp)
-[![npm downloads](https://img.shields.io/npm/dm/oci-pricing-mcp.svg)](https://www.npmjs.com/package/oci-pricing-mcp)
-[![CI](https://github.com/jasonwilbur/oci-pricing-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/jasonwilbur/oci-pricing-mcp/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
-[![MCP Registry](https://img.shields.io/badge/MCP-Registry-blue)](https://registry.modelcontextprotocol.io)
 
 A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server that provides Oracle Cloud Infrastructure pricing data to AI assistants like Claude.
 
+> **Fork of [jasonwilbur/oci-pricing-mcp](https://github.com/jasonwilbur/oci-pricing-mcp)** with a corrected PostgreSQL cost model, live per-SKU pricing, Windows licensing, a paid-by-default free-tier policy, and USD→BRL conversion for Brazilian pricing. See [What's different in this fork](#whats-different-in-this-fork).
+
 > **Important Note:** This server provides pricing data from Oracle's public pricing API and bundled data. We cannot guarantee that AI assistants will always interpret pricing correctly or identify the absolute cheapest options. Always verify pricing on [Oracle's official price list](https://www.oracle.com/cloud/price-list/) before making decisions. All API calls are free of charge (no authentication required).
+
+## What's different in this fork
+
+- **PostgreSQL cost model fixed.** OCI Managed PostgreSQL bills **4 SKUs**, not one: managed service (`B99060`, $0.098/OCPU/hr) + underlying E5 compute (`B97384`) + E5 memory (`B97385`) + optimized storage (`B99062`). Upstream modeled a single line at a stale $0.0336/OCPU, returning ~$25/mo where Oracle bills ~$119. `calculate_database_cost` now emits the full breakdown with **live per-SKU prices** and an optional `memoryGB` param, and enforces the **1 OCPU / 16 GB minimum**.
+- **Live SKU pricing.** Prices are looked up live per part number (via Oracle's public API) with the bundled snapshot as fallback.
+- **Windows licensing.** `calculate_monthly_cost` accepts `os: "windows"` (adds the `B88318` Windows OS license, $0.092/OCPU/hr) and `burstBaseline` (reduces the billed license OCPUs for burstable shapes).
+- **Paid-by-default free-tier policy.** Estimates use **100% paid SKUs**. Always Free is applied **only** to network egress (≤10 TB/month), public IPs, and VCN — never to compute, storage, databases, load balancers, or other managed services. (Also fixed an upstream accounting bug where free egress created a phantom credit that zeroed out unrelated paid items like the load balancer.)
+- **`convert_usd_brl` tool.** Converts USD to BRL grossing up Brazilian tax: `BRL = USD × fxRate ÷ taxDivisor` (defaults `5.23` / `0.87`, overridable via env `OCI_FX_BRL` / `OCI_TAX_DIVISOR` or per call).
 
 ## Why This Exists
 
@@ -68,8 +74,10 @@ making it significantly more cost-effective for data-heavy workloads.
 
 ### Quick Install (Recommended)
 
+Runs straight from this GitHub repo (the `prepare` script builds it on install):
+
 ```bash
-claude mcp add oci-pricing -- npx -y oci-pricing-mcp
+claude mcp add oci-pricing -- npx -y github:klaoslacerdacs/oci-pricing-mcp-br
 ```
 
 ### For Claude Desktop Users
@@ -81,7 +89,7 @@ Add this to your `claude_desktop_config.json` (macOS: `~/Library/Application Sup
   "mcpServers": {
     "oci-pricing": {
       "command": "npx",
-      "args": ["-y", "oci-pricing-mcp"]
+      "args": ["-y", "github:klaoslacerdacs/oci-pricing-mcp-br"]
     }
   }
 }
@@ -90,11 +98,11 @@ Add this to your `claude_desktop_config.json` (macOS: `~/Library/Application Sup
 ### From Source
 
 ```bash
-git clone https://github.com/jasonwilbur/oci-pricing-mcp.git
-cd oci-pricing-mcp
+git clone https://github.com/klaoslacerdacs/oci-pricing-mcp-br.git
+cd oci-pricing-mcp-br
 npm install
 npm run build
-claude mcp add oci-pricing -- node /path/to/oci-pricing-mcp/dist/index.js
+claude mcp add oci-pricing -- node /path/to/oci-pricing-mcp-br/dist/index.js
 ```
 
 ## Available Tools
@@ -107,7 +115,8 @@ claude mcp add oci-pricing -- node /path/to/oci-pricing-mcp/dist/index.js
 | `list_services` | List all OCI services with pricing categories |
 | `compare_regions` | Compare pricing across regions (OCI has consistent global pricing) |
 | `list_regions` | List all available OCI regions |
-| `calculate_monthly_cost` | Estimate monthly spend for a configuration |
+| `calculate_monthly_cost` | Estimate monthly spend for a configuration (supports `os: "windows"` + `burstBaseline`) |
+| `convert_usd_brl` | Convert a USD amount to BRL with tax gross-up (`BRL = USD × 5.23 ÷ 0.87`) |
 | `quick_estimate` | Get cost estimates for common deployment presets |
 
 ### Compute Tools
@@ -131,7 +140,7 @@ claude mcp add oci-pricing -- node /path/to/oci-pricing-mcp/dist/index.js
 | Tool | Description |
 |------|-------------|
 | `list_database_options` | Autonomous DB, MySQL, PostgreSQL pricing |
-| `calculate_database_cost` | Calculate database cost |
+| `calculate_database_cost` | Calculate database cost (PostgreSQL uses the 4-SKU live model; enforces 1 OCPU / 16 GB min) |
 | `compare_database_options` | Compare options for workload type |
 
 ### Networking Tools
@@ -206,6 +215,28 @@ Available presets:
 - `ml-training` - 8x A100 GPUs (part-time)
 - `kubernetes-cluster` - 3 nodes, 4 OCPU each
 
+### Brazilian pricing (BRL)
+
+Estimate in USD, then convert with tax gross-up:
+
+```
+What's the monthly PostgreSQL cost for 1 OCPU / 16 GB, and how much is that in BRL?
+```
+
+`convert_usd_brl` applies `BRL = USD × fxRate ÷ taxDivisor`. Defaults are `fxRate=5.23` and `taxDivisor=0.87` (~13% tax gross-up); override per call or via env:
+
+```json
+{
+  "mcpServers": {
+    "oci-pricing": {
+      "command": "npx",
+      "args": ["-y", "github:klaoslacerdacs/oci-pricing-mcp-br"],
+      "env": { "OCI_FX_BRL": "5.23", "OCI_TAX_DIVISOR": "0.87" }
+    }
+  }
+}
+```
+
 ## OCI Pricing Highlights
 
 ### Key Differentiators
@@ -215,6 +246,8 @@ Available presets:
 - **Free Kubernetes Control Plane**: OKE Basic clusters have no management fee
 - **Network Load Balancer**: Completely free (no hourly or data charges)
 - **Always Free Tier**: Never expires - 4 Arm OCPUs, 24GB RAM, 200GB storage, 2 Autonomous DBs
+
+> **This fork's estimator is paid-by-default:** Always Free is applied only to network egress (≤10 TB), public IPs, and VCN — never to compute, storage, databases, load balancers, or other managed services. The Always Free tier above is informational, not subtracted from estimates.
 
 ### Cost-Effective Shapes
 
@@ -321,14 +354,16 @@ node dist/index.js
 npm run dev
 ```
 
-## Author
+## Credits
 
-**Jason Wilbur** - [jasonwilbur.com](https://jasonwilbur.com)
+Fork maintained by **[klaoslacerdacs](https://github.com/klaoslacerdacs)**.
+
+Based on the original [oci-pricing-mcp](https://github.com/jasonwilbur/oci-pricing-mcp) by **Jason Wilbur** — [jasonwilbur.com](https://jasonwilbur.com).
 
 ## License
 
-Apache 2.0
+Apache 2.0 (inherited from upstream).
 
 ## Contributing
 
-Issues and pull requests welcome at [GitHub](https://github.com/jasonwilbur/oci-pricing-mcp).
+Issues and pull requests for this fork: [klaoslacerdacs/oci-pricing-mcp-br](https://github.com/klaoslacerdacs/oci-pricing-mcp-br). Upstream fixes are welcome back at the [original repo](https://github.com/jasonwilbur/oci-pricing-mcp).
