@@ -191,6 +191,18 @@ export interface StoragePricing extends PricingItem {
   performanceTier?: string;
 }
 
+// Serverless pricing (OCI Functions, API Gateway, Events, Queue, Streaming)
+export interface ServerlessPricing {
+  service: 'serverless';
+  type: string;
+  description: string;
+  unit: string;
+  pricePerUnit: number;
+  currency: string;
+  freePerMonth?: number;
+  notes?: string;
+}
+
 // Database pricing
 export interface DatabasePricing extends PricingItem {
   service: 'database';
@@ -641,6 +653,7 @@ export interface OCIPricingData {
   database: DatabasePricing[];
   networking: NetworkingPricing[];
   kubernetes: KubernetesPricing[];
+  serverless?: ServerlessPricing[];
   // New service categories
   aiMl?: AIMLPricing[];
   observability?: ObservabilityPricing[];

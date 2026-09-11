@@ -202,6 +202,18 @@ Vantage covers compute/DB *instances*. For everything else — AKS/GKE, Cloud Ru
 - **AWS** — bundled from the authoritative, keyless [AWS Price List Bulk API](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/using-price-list-api.html) into `src/data/service-pricing.json`, one row per on-demand price dimension. Example: `get_service_price({ service: "EKS", query: "cluster", region: "us-east-1" })` → `Amazon EKS cluster usage · $0.10/hr`. Refresh: `npx tsx scripts/fetch-cloud-prices.ts` (no key). Edit `AWS_CONFIG` to add services/regions.
 - **GCP** — live from the Cloud Billing Catalog through a small pricing proxy we host (the GCP key lives server-side; no key or GCP source exists unauthenticated). The proxy base is set via env `GCP_PRICE_URL`. Example: `get_gcp_price({ service: "Cloud SQL", query: "PostgreSQL", region: "southamerica-east1" })` → `Cloud SQL for PostgreSQL · São Paulo · $0.21/hr`.
 
+### Cross-Cloud Comparison
+
+Puts OCI side by side with AWS/Azure/GCP for one service category, pulling each cloud's price live from the sources above.
+
+| Tool | Description |
+|------|-------------|
+| `compare_service` | `category` ∈ `object-storage`, `serverless`, `database-postgres`, `kubernetes`, `data-warehouse`. `region` preset `us`\|`br` (mapped per cloud). `sizing` per category. Returns each cloud's real priced components + a `monthlyEstimate` where units align, and a `cheapest`. |
+
+Honest by design: it never forces a single number where units differ. `data-warehouse` returns `comparable:false` (OCI ADW $/ECPU-hr vs Redshift $/node-hr vs BigQuery $/TiB-scanned vs Synapse DWU-hr) — components only. `sizing` keys: storage `{storageGB,tier}`; serverless `{monthlyInvocations,avgDurationMs,memoryMB}`; database-postgres/data-warehouse `{ocpus,memoryGB,storageGB,awsRdsInstanceType}`; kubernetes `{nodeCount,vcpu,memoryGB,awsNodeType,azureNodeType,gcpNodeType}`.
+
+Example — `compare_service({ category: "object-storage", region: "br", sizing: { storageGB: 1000 } })` → OCI **$25.50** vs S3 $40.50 vs Blob $48.90 vs GCS $35.00/mo (cheapest: OCI). Cross-cloud sizing uses 1 OCPU = 2 vCPU; compute-only for Azure/GCP DB (add storage/HA), on-demand nodes for K8s.
+
 ### Service Category Tools
 
 | Tool | Description |

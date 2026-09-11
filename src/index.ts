@@ -50,6 +50,7 @@ import { getAiPrice } from './tools/aipricing.js';
 import { getAzurePrice } from './tools/cloudprice.js';
 import { getServicePrice } from './tools/bundled.js';
 import { getGcpPrice } from './tools/gcpprice.js';
+import { compareService } from './tools/compare.js';
 import {
   listAIMLServices,
   listObservabilityServices,
@@ -915,6 +916,22 @@ const TOOLS = [
       },
     },
   },
+  {
+    name: 'compare_service',
+    description: 'Compare OCI vs AWS/Azure/GCP for one service category, side by side with real units. Categories: object-storage, serverless, database-postgres, kubernetes, data-warehouse. Monthly estimate where units align (data-warehouse is components-only).',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        category: { type: 'string', enum: ['object-storage', 'serverless', 'database-postgres', 'kubernetes', 'data-warehouse'] },
+        region: { type: 'string', enum: ['us', 'br'], description: 'Region preset mapped per cloud (default us)' },
+        sizing: {
+          type: 'object',
+          description: 'Category sizing: storage {storageGB,tier}; serverless {monthlyInvocations,avgDurationMs,memoryMB}; database-postgres/data-warehouse {ocpus,memoryGB,storageGB,awsRdsInstanceType}; kubernetes {nodeCount,vcpu,memoryGB,awsNodeType,azureNodeType,gcpNodeType}',
+        },
+      },
+      required: ['category'],
+    },
+  },
 ];
 
 // Tools that reach out over the network (Oracle live pricing API, or the Vantage
@@ -927,6 +944,7 @@ const OPEN_WORLD_TOOLS = new Set([
   'get_ai_price', // azure branch reaches prices.azure.com (gcp branch is bundled)
   'get_azure_price',
   'get_gcp_price', // live via the Cloud Billing Catalog proxy
+  'compare_service', // fans out to the live cloud sources above
 ]);
 
 // Handle list tools request. Every tool here is read-only (none mutate state),
@@ -1167,6 +1185,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         break;
       case 'get_gcp_price':
         result = await getGcpPrice(typedArgs);
+        break;
+      case 'compare_service':
+        result = await compareService(typedArgs);
         break;
 
       default:

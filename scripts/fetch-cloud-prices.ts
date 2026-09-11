@@ -34,6 +34,7 @@ const AWS_CONFIG: Array<{ code: string; name: string }> = [
   { code: 'AmazonS3', name: 'S3' },
   { code: 'AmazonEKS', name: 'EKS' },
   { code: 'AmazonDynamoDB', name: 'DynamoDB' },
+  { code: 'AmazonRedshift', name: 'Redshift' },
 ];
 const AWS_REGIONS = ['us-east-1', 'sa-east-1'];
 

@@ -130,6 +130,14 @@ export function getKubernetesPricing() {
 }
 
 /**
+ * Get serverless pricing data (OCI Functions, API Gateway, Events, ...)
+ */
+export function getServerlessPricing() {
+  const data = getPricingData();
+  return data.serverless ?? [];
+}
+
+/**
  * Get services catalog
  */
 export function getServicesCatalog() {
