@@ -1,17 +1,13 @@
 /**
- * General cross-cloud price lookup for services NOT covered by the Vantage
- * instances MCP (which is compute/DB *instances* only): AKS, GKE, Cloud Run,
- * BigQuery, managed databases, caches, etc.
- *
- * - Azure: LIVE, no key — the Retail Prices API covers every Azure service.
- * - GCP:   LIVE via the Cloud Billing Catalog API, which REQUIRES an API key
- *          (env GCP_API_KEY). There is no unauthenticated GCP price source.
+ * Live Azure price lookup for services NOT covered by the Vantage instances MCP
+ * (AKS, databases, caches, storage, etc.). The Azure Retail Prices API is public
+ * and keyless. GCP + AWS non-instance services are served locally instead — see
+ * src/tools/bundled.ts (getServicePrice).
  */
 
 import { pricingCache } from '../data/cache.js';
 
 const AZURE_API = 'https://prices.azure.com/api/retail/prices';
-const GCP_API = 'https://cloudbilling.googleapis.com/v1';
 
 const esc = (s: string) => s.replace(/'/g, "''"); // OData literal escape
 
@@ -73,101 +69,4 @@ export async function getAzurePrice(params: GetAzurePriceParams) {
   };
   pricingCache.set(cacheKey, result, 720);
   return result;
-}
-
-export interface GetGcpPriceParams {
-  service?: string; // GCP service displayName substring, e.g. "Kubernetes", "BigQuery", "Cloud Run"
-  query?: string; // SKU description substring, e.g. "N2 Instance Core"
-}
-
-interface GcpSku {
-  description: string;
-  category?: { resourceFamily?: string; resourceGroup?: string; usageType?: string };
-  serviceRegions?: string[];
-  pricingInfo?: Array<{ pricingExpression?: { usageUnitDescription?: string; tieredRates?: Array<{ unitPrice?: { currencyCode?: string; units?: string; nanos?: number } }> } }>;
-}
-
-function skuPrice(s: GcpSku) {
-  const rate = s.pricingInfo?.[0]?.pricingExpression?.tieredRates?.slice(-1)[0]?.unitPrice;
-  if (!rate) return null;
-  return {
-    price: Number(rate.units || 0) + (rate.nanos || 0) / 1e9,
-    currency: rate.currencyCode || 'USD',
-    unit: s.pricingInfo?.[0]?.pricingExpression?.usageUnitDescription || '',
-  };
-}
-
-/** GCP Cloud Billing Catalog. Needs GCP_API_KEY. No service -> list services. */
-export async function getGcpPrice(params: GetGcpPriceParams) {
-  const key = process.env.GCP_API_KEY;
-  if (!key) {
-    return {
-      error: 'GCP live pricing needs an API key.',
-      howTo: 'Set env GCP_API_KEY to a key with the Cloud Billing Catalog API enabled (console.cloud.google.com/apis/library/cloudbilling.googleapis.com). GCP has no unauthenticated price API.',
-      keylessAlternative: 'For Gemini/generative-AI prices use get_ai_price (provider "gcp") — a bundled snapshot that needs no key.',
-    };
-  }
-
-  // Resolve service list (cached — the catalog is stable).
-  const svcKey = 'gcp_services';
-  let services = pricingCache.get<Array<{ serviceId: string; displayName: string }>>(svcKey);
-  if (!services) {
-    const all: Array<{ serviceId: string; displayName: string }> = [];
-    let pageToken = '';
-    do {
-      const u = `${GCP_API}/services?key=${encodeURIComponent(key)}&pageSize=5000${pageToken ? `&pageToken=${pageToken}` : ''}`;
-      const r = await fetch(u, { signal: AbortSignal.timeout(15000) });
-      if (!r.ok) throw new Error(`GCP Catalog HTTP ${r.status}`);
-      const d = (await r.json()) as { services: Array<{ serviceId: string; displayName: string }>; nextPageToken?: string };
-      all.push(...(d.services || []));
-      pageToken = d.nextPageToken || '';
-    } while (pageToken);
-    services = all;
-    pricingCache.set(svcKey, services, 1440); // 24h
-  }
-
-  if (!params.service) {
-    const q = params.query?.toLowerCase();
-    const list = (q ? services.filter((s) => s.displayName.toLowerCase().includes(q)) : services)
-      .map((s) => ({ serviceId: s.serviceId, displayName: s.displayName }));
-    return { provider: 'GCP', source: 'Cloud Billing Catalog API (live)', usage: 'Pass service (displayName substring) to list its SKUs.', count: list.length, services: list };
-  }
-
-  const svc = services.find((s) => s.displayName.toLowerCase().includes(params.service!.toLowerCase()));
-  if (!svc) return { error: `No GCP service matching "${params.service}"`, hint: 'Call get_gcp_price with no service to list them.' };
-
-  // Page through the service's SKUs.
-  const skus: GcpSku[] = [];
-  let pageToken = '';
-  do {
-    const u = `${GCP_API}/services/${svc.serviceId}/skus?key=${encodeURIComponent(key)}&pageSize=5000${pageToken ? `&pageToken=${pageToken}` : ''}`;
-    const r = await fetch(u, { signal: AbortSignal.timeout(20000) });
-    if (!r.ok) throw new Error(`GCP Catalog SKUs HTTP ${r.status}`);
-    const d = (await r.json()) as { skus: GcpSku[]; nextPageToken?: string };
-    skus.push(...(d.skus || []));
-    pageToken = d.nextPageToken || '';
-  } while (pageToken);
-
-  const q = params.query?.toLowerCase();
-  const rows = skus
-    .filter((s) => !q || s.description.toLowerCase().includes(q))
-    .slice(0, 50)
-    .map((s) => ({
-      description: s.description,
-      family: s.category?.resourceFamily,
-      usageType: s.category?.usageType,
-      regions: s.serviceRegions,
-      ...(skuPrice(s) || { price: null }),
-    }));
-
-  return {
-    provider: 'GCP',
-    source: 'Cloud Billing Catalog API (live)',
-    service: svc.displayName,
-    filters: { query: params.query || null },
-    returned: rows.length,
-    totalSkus: skus.length,
-    skus: rows,
-    note: 'Price is the last tiered rate (units + nanos). GCP prices vary by region/usageType (on-demand vs commit) — check those fields.',
-  };
 }

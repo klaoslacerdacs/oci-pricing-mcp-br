@@ -195,9 +195,11 @@ Vantage covers compute/DB *instances*. For everything else — AKS/GKE, Cloud Ru
 | Tool | Description |
 |------|-------------|
 | `get_azure_price` | **Live**, no key. Any Azure service via `prices.azure.com`. Pass `query` (matches serviceName/productName/meterName) and/or exact `serviceName`, plus `region`/`currency`/`top`. |
-| `get_gcp_price` | **Live** via the Cloud Billing Catalog API. **Requires env `GCP_API_KEY`.** No `service` arg → lists services; with `service` (displayName substring) → its SKUs, filterable by `query`. |
+| `get_service_price` | **Local**, no key. GCP + AWS services (GKE, Cloud Run, BigQuery, Cloud SQL, Lambda, S3, EKS, DynamoDB) from a bundled Infracost snapshot. Filter by `vendor`/`service`/`query`/`region`; no args lists what's mirrored. |
 
-GCP needs a key with the [Cloud Billing Catalog API](https://console.cloud.google.com/apis/library/cloudbilling.googleapis.com) enabled — set `GCP_API_KEY` in the MCP server env. Without it the tool returns a clear error (and points AI queries to `get_ai_price`, which needs no key). Example: `get_azure_price({ query: "PostgreSQL", region: "brazilsouth" })` → `Azure Database for PostgreSQL · vCore · $0.12/hr`.
+- **Azure** is live from `prices.azure.com`. Example: `get_azure_price({ query: "PostgreSQL", region: "brazilsouth" })` → `Azure Database for PostgreSQL · vCore · $0.12/hr`.
+- **GCP + AWS** (the services Vantage doesn't cover) are bundled from the [Infracost Cloud Pricing API](https://www.infracost.io/docs/supported_resources/cloud_pricing_api/) into `src/data/infracost-pricing.json` — no runtime key. Example: `get_service_price({ vendor: "gcp", service: "Cloud SQL", query: "PostgreSQL", region: "southamerica-east1" })` → `Cloud SQL for PostgreSQL · Regional vCPU · São Paulo · $0.21/hr`.
+- Refresh the snapshot: `INFRACOST_API_KEY=ico-... npx tsx scripts/fetch-infracost.ts` (key from `infracost auth login`, read from env only — never committed). Edit the `CONFIG` list in that script to add services/regions. Note: any single service/region is capped at 1000 SKUs by the API.
 
 ### Service Category Tools
 
