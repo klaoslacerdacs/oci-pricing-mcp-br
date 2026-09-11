@@ -80,19 +80,23 @@ export interface CloudInstancePriceParams {
   provider: Provider;
   instanceType: string;
   region?: string;
-  os?: string;
+  os?: string; // for RDS this selects the engine (PostgreSQL/MySQL/MariaDB/SQL Server/Oracle...)
+  service?: 'ec2' | 'rds'; // aws only; rds prices managed databases (db.* instance types)
 }
 
-/** Raw live price + specs for one cloud instance type. */
+/** Raw live price + specs for one cloud instance type (EC2/RDS/Azure/GCP). */
 export async function getCloudInstancePrice(params: CloudInstancePriceParams) {
   const cfg = PROVIDERS[params.provider];
   if (!cfg) throw new Error(`Unknown provider: ${params.provider}`);
+  const rds = params.provider === 'aws' && params.service === 'rds';
+  const detailTool = rds ? 'get-rds-instance' : cfg.detailTool;
+  const regionTool = rds ? 'get-rds-region-pricing' : cfg.regionTool;
   const region = params.region || cfg.defaultRegion;
-  const os = params.os || 'Linux';
+  const os = params.os || (rds ? 'PostgreSQL' : 'Linux'); // RDS "os" column = DB engine
 
   const [detail, pricing] = await Promise.all([
-    callVantage(cfg.detailTool, { instanceType: params.instanceType }),
-    callVantage(cfg.regionTool, { instanceType: params.instanceType, region }),
+    callVantage(detailTool, { instanceType: params.instanceType }),
+    callVantage(regionTool, { instanceType: params.instanceType, region }),
   ]);
 
   const vcpu = parseSpec(detail, /vCPUs:\s*([0-9.]+)/i);
@@ -100,10 +104,10 @@ export async function getCloudInstancePrice(params: CloudInstancePriceParams) {
   const hourly = parseOnDemandHourly(pricing, os);
 
   return {
-    provider: cfg.label,
+    provider: rds ? 'AWS RDS' : cfg.label,
     instanceType: params.instanceType,
     region,
-    os,
+    [rds ? 'engine' : 'os']: os,
     vcpu,
     memoryGB,
     onDemandHourly: hourly,

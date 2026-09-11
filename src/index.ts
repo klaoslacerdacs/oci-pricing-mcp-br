@@ -819,14 +819,15 @@ const TOOLS = [
   // Multicloud compute (live AWS/Azure/GCP via Vantage instances MCP)
   {
     name: 'get_cloud_instance_price',
-    description: 'Live On-Demand price + specs for an AWS/Azure/GCP compute instance type, by region (source: instances.vantage.sh).',
+    description: 'Live On-Demand price + specs for an AWS EC2/RDS, Azure, or GCP instance type, by region (source: instances.vantage.sh). For AWS databases pass service:"rds".',
     inputSchema: {
       type: 'object' as const,
       properties: {
         provider: { type: 'string', enum: ['aws', 'azure', 'gcp'] },
-        instanceType: { type: 'string', description: 'e.g. t3.medium (aws), Standard_D2s_v5 (azure), e2-medium (gcp)' },
+        instanceType: { type: 'string', description: 'e.g. t3.medium / db.m5.large (aws), Standard_D2s_v5 (azure), e2-medium (gcp)' },
         region: { type: 'string', description: 'Provider region code; defaults us-east-1 / eastus / us-central1' },
-        os: { type: 'string', description: 'OS row to price (default Linux)' },
+        os: { type: 'string', description: 'EC2: OS row (default Linux). RDS: DB engine (default PostgreSQL) — MySQL/MariaDB/SQL Server/Oracle...' },
+        service: { type: 'string', enum: ['ec2', 'rds'], description: 'AWS only: "rds" prices managed databases (db.* types). Default ec2.' },
       },
       required: ['provider', 'instanceType'],
     },
@@ -929,8 +930,8 @@ const OPEN_WORLD_TOOLS = new Set([
 ]);
 
 // Handle list tools request. Every tool here is read-only (none mutate state),
-// so we attach `readOnlyHint` to all and `openWorldHint` only to the two that
-// hit Oracle's live pricing API.
+// so we attach `readOnlyHint` to all and `openWorldHint` only to the tools that
+// reach the network (see OPEN_WORLD_TOOLS above).
 server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: TOOLS.map((tool) => ({
