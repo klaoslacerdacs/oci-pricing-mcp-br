@@ -49,6 +49,7 @@ import { mapCloudServices } from './tools/servicemap.js';
 import { getAiPrice } from './tools/aipricing.js';
 import { getAzurePrice } from './tools/cloudprice.js';
 import { getServicePrice } from './tools/bundled.js';
+import { getGcpPrice } from './tools/gcpprice.js';
 import {
   listAIMLServices,
   listObservabilityServices,
@@ -886,15 +887,30 @@ const TOOLS = [
   },
   {
     name: 'get_service_price',
-    description: 'Local price lookup for GCP + AWS services Vantage does NOT cover (GKE, Cloud Run, BigQuery, Cloud SQL, Lambda, S3, EKS, DynamoDB), from a bundled Infracost snapshot — no key. No args lists what is mirrored.',
+    description: 'Local price lookup for AWS services Vantage does NOT cover (Lambda, S3, EKS, DynamoDB), from the bundled AWS Price List. Filter by service/query/region; no args lists what is mirrored. (GCP: use get_gcp_price.)',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        vendor: { type: 'string', enum: ['gcp', 'aws'] },
-        service: { type: 'string', description: 'Service substring, e.g. "Cloud SQL", "Kubernetes", "Lambda"' },
-        query: { type: 'string', description: 'Substring on the SKU description/group, e.g. "N4 RAM", "Requests"' },
-        region: { type: 'string', description: 'Region substring, e.g. "sa-east-1", "southamerica-east1"' },
+        vendor: { type: 'string', enum: ['aws'] },
+        service: { type: 'string', description: 'Service substring, e.g. "Lambda", "S3", "EKS", "DynamoDB"' },
+        query: { type: 'string', description: 'Substring on the SKU description, e.g. "cluster", "GB-Second", "first 50 TB"' },
+        region: { type: 'string', description: 'Region substring, e.g. "us-east-1", "sa-east-1"' },
         top: { type: 'number', description: 'Max rows (default 30, max 100)' },
+      },
+    },
+  },
+  {
+    name: 'get_gcp_price',
+    description: 'Live GCP pricing via the Cloud Billing Catalog (GKE, Cloud Run, BigQuery, Cloud SQL, etc.) — no key. No service arg lists services; with service (name or serviceId) returns its SKUs.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        service: { type: 'string', description: 'Service displayName substring or serviceId, e.g. "Cloud SQL", "Kubernetes Engine", "9662-B51E-5089"' },
+        query: { type: 'string', description: 'SKU description substring, e.g. "PostgreSQL vCPU", "Autopilot"' },
+        region: { type: 'string', description: 'Filter SKUs offered in this region, e.g. "southamerica-east1"' },
+        usageType: { type: 'string', description: 'Exact usageType, e.g. "OnDemand", "Preemptible"' },
+        pageSize: { type: 'number', description: 'Max SKUs per page (default 200, max 1000)' },
+        pageToken: { type: 'string', description: 'nextPageToken from a previous call' },
       },
     },
   },
@@ -909,6 +925,7 @@ const OPEN_WORLD_TOOLS = new Set([
   'compare_vm_oci_vs_cloud',
   'get_ai_price', // azure branch reaches prices.azure.com (gcp branch is bundled)
   'get_azure_price',
+  'get_gcp_price', // live via the Cloud Billing Catalog proxy
 ]);
 
 // Handle list tools request. Every tool here is read-only (none mutate state),
@@ -1146,6 +1163,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         break;
       case 'get_service_price':
         result = getServicePrice(typedArgs);
+        break;
+      case 'get_gcp_price':
+        result = await getGcpPrice(typedArgs);
         break;
 
       default:

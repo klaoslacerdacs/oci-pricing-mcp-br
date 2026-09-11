@@ -195,13 +195,12 @@ Vantage covers compute/DB *instances*. For everything else — AKS/GKE, Cloud Ru
 | Tool | Description |
 |------|-------------|
 | `get_azure_price` | **Live**, no key. Any Azure service via `prices.azure.com`. Pass `query` (matches serviceName/productName/meterName) and/or exact `serviceName`, plus `region`/`currency`/`top`. |
-| `get_service_price` | **Local**, no key. GCP + AWS services (GKE, Cloud Run, BigQuery, Cloud SQL, Lambda, S3, EKS, DynamoDB) from a bundled snapshot. Filter by `vendor`/`service`/`query`/`region`; no args lists what's mirrored. |
+| `get_service_price` | **Local**, no key. AWS services (Lambda, S3, EKS, DynamoDB) from the bundled AWS Price List. Filter by `service`/`query`/`region`; no args lists what's mirrored. |
+| `get_gcp_price` | **Live**, no key on this side. GCP services (GKE, Cloud Run, BigQuery, Cloud SQL, …) via the Cloud Billing Catalog. No `service` arg lists services; with `service` (name or `serviceId`) returns SKUs, filterable by `query`/`region`/`usageType`. |
 
-- **Azure** is live from `prices.azure.com`. Example: `get_azure_price({ query: "PostgreSQL", region: "brazilsouth" })` → `Azure Database for PostgreSQL · vCore · $0.12/hr`.
-- **GCP + AWS** (the services Vantage doesn't cover) are bundled into `src/data/service-pricing.json` — no runtime key:
-  - **AWS** from the authoritative, keyless [AWS Price List Bulk API](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/using-price-list-api.html) — one row per on-demand price dimension. Example: `get_service_price({ vendor: "aws", service: "EKS", query: "cluster", region: "us-east-1" })` → `Amazon EKS cluster usage · $0.10/hr`.
-  - **GCP** from the [Infracost Cloud Pricing API](https://www.infracost.io/docs/supported_resources/cloud_pricing_api/) (no unauthenticated GCP source exists). Example: `get_service_price({ vendor: "gcp", service: "Cloud SQL", query: "PostgreSQL", region: "southamerica-east1" })` → `Cloud SQL for PostgreSQL · São Paulo · $0.21/hr`.
-- Refresh: `npx tsx scripts/fetch-cloud-prices.ts` — AWS refreshes with no key; GCP refreshes only if `INFRACOST_API_KEY=ico-...` is set (from `infracost auth login`), otherwise existing GCP rows are kept. The key is read from env only — never committed. Edit `AWS_CONFIG`/`GCP_CONFIG` in the script to add services/regions.
+- **Azure** — live from `prices.azure.com`. Example: `get_azure_price({ query: "PostgreSQL", region: "brazilsouth" })` → `Azure Database for PostgreSQL · vCore · $0.12/hr`.
+- **AWS** — bundled from the authoritative, keyless [AWS Price List Bulk API](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/using-price-list-api.html) into `src/data/service-pricing.json`, one row per on-demand price dimension. Example: `get_service_price({ service: "EKS", query: "cluster", region: "us-east-1" })` → `Amazon EKS cluster usage · $0.10/hr`. Refresh: `npx tsx scripts/fetch-cloud-prices.ts` (no key). Edit `AWS_CONFIG` to add services/regions.
+- **GCP** — live from the Cloud Billing Catalog through a small pricing proxy we host (the GCP key lives server-side; no key or GCP source exists unauthenticated). The proxy base is set via env `GCP_PRICE_URL`. Example: `get_gcp_price({ service: "Cloud SQL", query: "PostgreSQL", region: "southamerica-east1" })` → `Cloud SQL for PostgreSQL · São Paulo · $0.21/hr`.
 
 ### Service Category Tools
 
