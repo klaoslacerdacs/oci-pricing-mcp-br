@@ -47,6 +47,7 @@ import { listMulticloudDatabases, getMulticloudAvailabilityMatrix, calculateMult
 import { getCloudInstancePrice, compareVmOciVsCloud } from './tools/vantage.js';
 import { mapCloudServices } from './tools/servicemap.js';
 import { getAiPrice } from './tools/aipricing.js';
+import { getAzurePrice, getGcpPrice } from './tools/cloudprice.js';
 import {
   listAIMLServices,
   listObservabilityServices,
@@ -868,6 +869,31 @@ const TOOLS = [
       required: ['provider'],
     },
   },
+  {
+    name: 'get_azure_price',
+    description: 'Live price for ANY Azure service via prices.azure.com (AKS, databases, Cache, storage, etc.). Requires query or serviceName; not covered by Vantage.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        query: { type: 'string', description: 'Substring across serviceName/productName/meterName, e.g. "PostgreSQL", "Kubernetes", "Redis"' },
+        serviceName: { type: 'string', description: 'Exact Azure serviceName, e.g. "Azure Kubernetes Service"' },
+        region: { type: 'string', description: 'armRegionName, e.g. eastus, brazilsouth' },
+        currency: { type: 'string', description: 'Currency code (default USD)' },
+        top: { type: 'number', description: 'Max rows (default 20, max 100)' },
+      },
+    },
+  },
+  {
+    name: 'get_gcp_price',
+    description: 'Live GCP pricing via the Cloud Billing Catalog API (GKE, Cloud Run, BigQuery, Cloud SQL, etc.). Requires env GCP_API_KEY. No service arg lists services; with service returns its SKUs.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        service: { type: 'string', description: 'GCP service displayName substring, e.g. "Kubernetes", "BigQuery", "Cloud Run", "Cloud SQL"' },
+        query: { type: 'string', description: 'SKU description substring, e.g. "N2 Instance Core", "Analysis"' },
+      },
+    },
+  },
 ];
 
 // Tools that reach out over the network (Oracle live pricing API, or the Vantage
@@ -878,6 +904,8 @@ const OPEN_WORLD_TOOLS = new Set([
   'get_cloud_instance_price',
   'compare_vm_oci_vs_cloud',
   'get_ai_price', // azure branch reaches prices.azure.com (gcp branch is bundled)
+  'get_azure_price',
+  'get_gcp_price',
 ]);
 
 // Handle list tools request. Every tool here is read-only (none mutate state),
@@ -1109,6 +1137,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         break;
       case 'get_ai_price':
         result = await getAiPrice(typedArgs);
+        break;
+      case 'get_azure_price':
+        result = await getAzurePrice(typedArgs);
+        break;
+      case 'get_gcp_price':
+        result = await getGcpPrice(typedArgs);
         break;
 
       default:

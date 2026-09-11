@@ -188,6 +188,17 @@ Vantage covers compute instances only, not AI. This tool fills Azure + GCP:
 
 Azure is live and huge — always pass a `query` (matches `meterName`, e.g. `"gpt"`, `"grok"`, `"img"`) and ideally a `region`. GCP has no unauthenticated pricing API, so it's a curated snapshot of `ai.google.dev/gemini-api/docs/pricing` — refresh `src/data/gcp-ai-pricing.json` when prices change.
 
+### Any Azure / GCP Service (beyond Vantage's instances)
+
+Vantage covers compute/DB *instances*. For everything else — AKS/GKE, Cloud Run, BigQuery, managed databases (PostgreSQL/MySQL/SQL), caches:
+
+| Tool | Description |
+|------|-------------|
+| `get_azure_price` | **Live**, no key. Any Azure service via `prices.azure.com`. Pass `query` (matches serviceName/productName/meterName) and/or exact `serviceName`, plus `region`/`currency`/`top`. |
+| `get_gcp_price` | **Live** via the Cloud Billing Catalog API. **Requires env `GCP_API_KEY`.** No `service` arg → lists services; with `service` (displayName substring) → its SKUs, filterable by `query`. |
+
+GCP needs a key with the [Cloud Billing Catalog API](https://console.cloud.google.com/apis/library/cloudbilling.googleapis.com) enabled — set `GCP_API_KEY` in the MCP server env. Without it the tool returns a clear error (and points AI queries to `get_ai_price`, which needs no key). Example: `get_azure_price({ query: "PostgreSQL", region: "brazilsouth" })` → `Azure Database for PostgreSQL · vCore · $0.12/hr`.
+
 ### Service Category Tools
 
 | Tool | Description |
