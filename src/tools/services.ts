@@ -480,7 +480,7 @@ export function listAdditionalServices(params: ListAdditionalServicesParams = {}
     lastUpdated: getLastUpdated(),
     availableTypes: [...new Set(pricing.map(p => p.type))],
     serviceDescriptions: {
-      opensearch: 'Managed OpenSearch for log analytics and search',
+      opensearch: 'Managed OpenSearch for log analytics and search. No standalone node — minimum is a full cluster (leader+data+dashboard E4 nodes, HA node/hr, block volume): floor ~$313/month',
       'secure-desktops': 'Virtual desktop infrastructure (VDI)',
       blockchain: 'Enterprise blockchain platform',
       timesten: 'In-memory database for Kubernetes',

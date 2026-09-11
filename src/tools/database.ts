@@ -195,11 +195,17 @@ export async function calculateDatabaseCost(params: CalculateDatabaseCostParams)
   const ecpuPrice = (db as { ecpuPrice?: number }).ecpuPrice;
   const computePrice = ecpuPrice || db.pricePerUnit;
   const computeUnit = ecpuPrice ? 'ECPU' : 'OCPU';
-  const computeCost = computePrice * params.computeUnits * hoursPerMonth;
+  // Autonomous floor: 2 ECPUs minimum — smaller configs cannot be provisioned.
+  let computeUnits = params.computeUnits;
+  if (params.type.startsWith('autonomous') && computeUnits < 2) {
+    computeUnits = 2;
+    notes.push(`Autonomous minimum is 2 ECPUs; clamped from ${params.computeUnits} (e.g. 2-ECPU ATP + 20 GB ≈ $506/mo at 744h)`);
+  }
+  const computeCost = computePrice * computeUnits * hoursPerMonth;
 
   breakdown.push({
     item: `${db.description} - Compute`,
-    quantity: params.computeUnits,
+    quantity: computeUnits,
     unit: computeUnit,
     unitPrice: computePrice,
     monthlyTotal: Math.round(computeCost * 100) / 100,
@@ -229,7 +235,7 @@ export async function calculateDatabaseCost(params: CalculateDatabaseCostParams)
     );
     if (byolDb) {
       const byolEcpuPrice = (byolDb as { ecpuPrice?: number }).ecpuPrice || byolDb.pricePerUnit;
-      const byolComputeCost = byolEcpuPrice * params.computeUnits * hoursPerMonth;
+      const byolComputeCost = byolEcpuPrice * computeUnits * hoursPerMonth;
       const byolTotal = byolComputeCost + storageCost;
       const savedAmount = totalMonthly - byolTotal;
       const percentSaved = Math.round((savedAmount / totalMonthly) * 100);
@@ -255,6 +261,7 @@ export async function calculateDatabaseCost(params: CalculateDatabaseCostParams)
 
   if (params.type === 'autonomous-transaction-processing' || params.type === 'autonomous-data-warehouse') {
     notes.push('Auto-scaling can increase compute beyond configured ECPUs - set limits to control costs');
+    notes.push('Backup storage (B95754, $0.0299/GB/mo) billed separately — Oracle sizes it ~3x DB storage by default');
   }
 
   return {

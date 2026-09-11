@@ -17,6 +17,7 @@ A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server that p
 - **`convert_usd_brl` tool.** Converts USD to BRL grossing up Brazilian tax: `BRL = USD × fxRate ÷ taxDivisor` (defaults `5.23` / `0.87`, overridable via env `OCI_FX_BRL` / `OCI_TAX_DIVISOR` or per call).
 - **Live multicloud compute.** `get_cloud_instance_price` and `compare_vm_oci_vs_cloud` pull **live** AWS/Azure/GCP instance pricing by proxying the public [Vantage instances MCP](https://instances.vantage.sh) (per-instance, avoids the unusable ~316 MB raw dumps). `compare_vm_oci_vs_cloud` applies the **OCPU↔vCPU de-para** (1 OCPU = 2 vCPU, RAM 1:1) against the OCI E5 shape. Endpoint overridable via env `VANTAGE_MCP_URL`. This replaces the old hardcoded competitor constants for compute — egress/k8s comparisons remain approximate.
 - **Cross-cloud service de-para.** `map_cloud_services` looks up equivalent OCI/AWS/Azure/GCP service names across 160 services / 20 categories (bundled from Oracle's public mapping table).
+- **Service minimums enforced.** Autonomous DB floor is **2 ECPUs** (`calculate_database_cost` clamps and notes it; 2-ECPU ATP + 20 GB ≈ **$506/mo** at 744h — ATP DB storage corrected to `B95706` $0.1953/GB/mo, backup `B95754` flagged as billed separately). OpenSearch has **no standalone node**: minimum deployment is a full cluster (leader + data + dashboard E4 nodes `B93113`/`B93114` + HA node `B93709` $0.25/hr + block volume) — practical floor **~$313/mo**.
 
 ## Why This Exists
 
