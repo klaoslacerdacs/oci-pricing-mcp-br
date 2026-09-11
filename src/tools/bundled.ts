@@ -1,7 +1,7 @@
 /**
  * Local price lookup for GCP + AWS services NOT covered by the Vantage
  * instances MCP. Served from a bundled Infracost snapshot (no runtime key).
- * Refresh: scripts/fetch-infracost.ts. See src/data/infracost-pricing.json.
+ * Refresh: scripts/fetch-cloud-prices.ts. See src/data/service-pricing.json.
  */
 
 import { readFileSync } from 'fs';
@@ -29,7 +29,7 @@ interface Bundle {
 
 let cache: Bundle | null = null;
 function bundle(): Bundle {
-  if (!cache) cache = JSON.parse(readFileSync(join(__dirname, '../data/infracost-pricing.json'), 'utf-8'));
+  if (!cache) cache = JSON.parse(readFileSync(join(__dirname, '../data/service-pricing.json'), 'utf-8'));
   return cache!;
 }
 
