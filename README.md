@@ -178,6 +178,16 @@ Example — `t3.medium` in São Paulo vs OCI: `$49.06/mo` (AWS) vs `$27.74/mo` (
 
 Each cloud field is a **list** of equivalent products (`[]` when a cloud has no equivalent). Example — `query: "bedrock"` → OCI `["Generative AI", "Generative AI Agents"]` = AWS `["Bedrock"]` = Azure `["OpenAI Service"]` = GCP `["Vertex AI Search and Conversation"]`. Name equivalence only; verify feature parity per provider.
 
+### Generative-AI Pricing (fills the Vantage gap)
+
+Vantage covers compute instances only, not AI. This tool fills Azure + GCP:
+
+| Tool | Description |
+|------|-------------|
+| `get_ai_price` | `provider: "azure"` → **live** AI/ML meters from `prices.azure.com` (filter by `query`/`region`/`currency`, capped by `top`). `provider: "gcp"` → **bundled** Gemini token prices (source + `asOf` date). OCI AI: use `list_aiml_services`. |
+
+Azure is live and huge — always pass a `query` (matches `meterName`, e.g. `"gpt"`, `"grok"`, `"img"`) and ideally a `region`. GCP has no unauthenticated pricing API, so it's a curated snapshot of `ai.google.dev/gemini-api/docs/pricing` — refresh `src/data/gcp-ai-pricing.json` when prices change.
+
 ### Service Category Tools
 
 | Tool | Description |

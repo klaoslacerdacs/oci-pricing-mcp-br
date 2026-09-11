@@ -1,0 +1,16 @@
+{
+  "source": "https://ai.google.dev/gemini-api/docs/pricing",
+  "asOf": "2026-09-11",
+  "currency": "USD",
+  "unit": "per 1M tokens (Standard tier, text I/O unless noted)",
+  "note": "Snapshot of paid-tier text token prices. GCP has no unauthenticated pricing API, so this is bundled — refresh from source when it changes. Audio/image/video and Batch/Flex/Priority tiers differ; see source. Some models tier by prompt size (>200k tokens).",
+  "models": [
+    { "model": "Gemini 2.5 Pro", "input": 1.25, "output": 10, "above200k": { "input": 2.5, "output": 15 } },
+    { "model": "Gemini 2.5 Flash", "input": 0.3, "output": 2.5, "notes": "audio input $1.00/1M" },
+    { "model": "Gemini 2.5 Flash-Lite", "input": 0.1, "output": 0.4, "notes": "audio input $0.30/1M" },
+    { "model": "Gemini 3.5 Flash", "input": 1.5, "output": 9 },
+    { "model": "Gemini 3.5 Flash-Lite", "input": 0.3, "output": 2.5 },
+    { "model": "Gemini 3.1 Pro Preview", "input": 2, "output": 12, "above200k": { "input": 4, "output": 18 } },
+    { "model": "Gemini Embedding 2", "input": 0.2, "output": null, "notes": "input only; image $0.45, audio $6.50, video $12 per 1M" }
+  ]
+}

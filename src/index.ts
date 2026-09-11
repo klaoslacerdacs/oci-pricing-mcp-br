@@ -46,6 +46,7 @@ import { listKubernetesOptions, calculateKubernetesCost, compareKubernetesProvid
 import { listMulticloudDatabases, getMulticloudAvailabilityMatrix, calculateMulticloudDatabaseCost, compareMulticloudVsOCI } from './tools/multicloud.js';
 import { getCloudInstancePrice, compareVmOciVsCloud } from './tools/vantage.js';
 import { mapCloudServices } from './tools/servicemap.js';
+import { getAiPrice } from './tools/aipricing.js';
 import {
   listAIMLServices,
   listObservabilityServices,
@@ -852,6 +853,21 @@ const TOOLS = [
       },
     },
   },
+  {
+    name: 'get_ai_price',
+    description: 'Generative-AI pricing not covered by Vantage: Azure (live via prices.azure.com) and GCP Gemini (bundled snapshot). For OCI AI use list_aiml_services.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        provider: { type: 'string', enum: ['azure', 'gcp'] },
+        query: { type: 'string', description: 'Model/meter substring, e.g. "gpt", "grok", "gemini 2.5 flash"' },
+        region: { type: 'string', description: 'Azure only: armRegionName, e.g. eastus' },
+        currency: { type: 'string', description: 'Azure only: currency code (default USD)' },
+        top: { type: 'number', description: 'Azure only: max rows (default 20, max 100)' },
+      },
+      required: ['provider'],
+    },
+  },
 ];
 
 // Tools that reach out over the network (Oracle live pricing API, or the Vantage
@@ -861,6 +877,7 @@ const OPEN_WORLD_TOOLS = new Set([
   'list_realtime_categories',
   'get_cloud_instance_price',
   'compare_vm_oci_vs_cloud',
+  'get_ai_price', // azure branch reaches prices.azure.com (gcp branch is bundled)
 ]);
 
 // Handle list tools request. Every tool here is read-only (none mutate state),
@@ -1089,6 +1106,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         break;
       case 'map_cloud_services':
         result = mapCloudServices(typedArgs);
+        break;
+      case 'get_ai_price':
+        result = await getAiPrice(typedArgs);
         break;
 
       default:

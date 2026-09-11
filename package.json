@@ -10,7 +10,7 @@
     "oci-pricing-mcp": "dist/index.js"
   },
   "scripts": {
-    "build": "tsc && node -e \"const fs=require('fs');fs.mkdirSync('dist/data',{recursive:true});for(const f of ['pricing-data.json','service-mapping.json'])fs.copyFileSync('src/data/'+f,'dist/data/'+f)\"",
+    "build": "tsc && node -e \"const fs=require('fs');fs.mkdirSync('dist/data',{recursive:true});for(const f of ['pricing-data.json','service-mapping.json','gcp-ai-pricing.json'])fs.copyFileSync('src/data/'+f,'dist/data/'+f)\"",
     "prepare": "npm run build",
     "start": "node dist/index.js",
     "dev": "tsc --watch",
