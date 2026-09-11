@@ -118,6 +118,29 @@ export async function getCloudInstancePrice(params: CloudInstancePriceParams) {
 
 export interface CompareVmParams extends CloudInstancePriceParams {}
 
+// AWS burstable (T-family) baseline CPU utilization per vCPU (AWS docs).
+const T_BASELINES: Record<string, Record<string, number>> = {
+  t2: { nano: 0.05, micro: 0.1, small: 0.2, medium: 0.2, large: 0.3, xlarge: 0.225, '2xlarge': 0.16875 },
+  t3: { nano: 0.05, micro: 0.1, small: 0.2, medium: 0.2, large: 0.3, xlarge: 0.4, '2xlarge': 0.4 },
+};
+T_BASELINES.t3a = T_BASELINES.t3;
+T_BASELINES.t4g = T_BASELINES.t3;
+
+/**
+ * De-para for AWS T2/T3 burstable vs OCI burstable VMs.
+ * OCI burstable bills compute at a baseline fraction (12.5% or 50% of OCPUs);
+ * bursting above it is free. Pick the smallest OCI baseline whose sustained
+ * vCPU capacity (ocpus × 2 × baseline) covers the T-instance's sustained vCPUs.
+ */
+export function chooseOciBurstBaseline(instanceType: string, vcpu: number, ocpus: number) {
+  const m = instanceType.match(/^(t[0-9]a?g?)\.([a-z0-9]+)$/i);
+  const perVcpu = m && T_BASELINES[m[1].toLowerCase()]?.[m[2].toLowerCase()];
+  if (!perVcpu) return null;
+  const sustainedVcpu = Math.round(vcpu * perVcpu * 1000) / 1000;
+  const baseline = [0.125, 0.5].find((b) => ocpus * 2 * b >= sustainedVcpu) ?? 1;
+  return { awsBaselinePerVcpu: perVcpu, sustainedVcpu, ociBaseline: baseline === 1 ? undefined : baseline };
+}
+
 /**
  * Compare a real cloud VM against the equivalent OCI E5 shape.
  * De-para: OCI sells OCPUs (1 OCPU = 1 physical core = 2 vCPUs); the other clouds
@@ -132,7 +155,13 @@ export async function compareVmOciVsCloud(params: CompareVmParams) {
 
   // ponytail: E5.Flex is whole-OCPU; round up odd vCPU counts. Fractional OCPU not offered.
   const ocpus = Math.max(1, Math.round(cloud.vcpu / 2));
-  const oci = calculateMonthlyCost({ compute: { shape: 'VM.Standard.E5.Flex', ocpus, memoryGB: cloud.memoryGB } });
+  // AWS T2/T3 are burstable: match with an OCI burstable baseline of equal sustained capacity.
+  const burstMatch = params.provider === 'aws' && params.service !== 'rds'
+    ? chooseOciBurstBaseline(params.instanceType, cloud.vcpu, ocpus)
+    : null;
+  const oci = calculateMonthlyCost({
+    compute: { shape: 'VM.Standard.E5.Flex', ocpus, memoryGB: cloud.memoryGB, burstBaseline: burstMatch?.ociBaseline },
+  });
 
   const ociMonthly = oci.totalMonthly;
   const diff = Math.round((cloud.monthlyOnDemand - ociMonthly) * 100) / 100;
@@ -150,12 +179,15 @@ export async function compareVmOciVsCloud(params: CompareVmParams) {
     oci: {
       shape: 'VM.Standard.E5.Flex',
       ocpus,
+      ...(burstMatch?.ociBaseline ? { burstBaseline: burstMatch.ociBaseline } : {}),
       memoryGB: cloud.memoryGB,
       region: 'any commercial (flat pricing)',
       monthly: ociMonthly,
       breakdown: oci.breakdown,
     },
-    depara: `${cloud.vcpu} vCPU = ${ocpus} OCPU (1 OCPU = 2 vCPU); RAM 1:1`,
+    depara: burstMatch?.ociBaseline
+      ? `${cloud.vcpu} vCPU = ${ocpus} OCPU (1 OCPU = 2 vCPU); RAM 1:1. Burstable: ${params.instanceType} baseline ${burstMatch.awsBaselinePerVcpu * 100}%/vCPU (${burstMatch.sustainedVcpu} sustained vCPU) → OCI burstable baseline ${burstMatch.ociBaseline} (${ocpus * 2 * burstMatch.ociBaseline} sustained vCPU)`
+      : `${cloud.vcpu} vCPU = ${ocpus} OCPU (1 OCPU = 2 vCPU); RAM 1:1`,
     verdict:
       diff > 0
         ? `OCI is $${Math.abs(diff)}/mo cheaper (${Math.abs(pct)}%)`
@@ -164,6 +196,9 @@ export async function compareVmOciVsCloud(params: CompareVmParams) {
           : 'Same price',
     currency: 'USD',
     notes: [
+      ...(burstMatch?.ociBaseline
+        ? ['Burstable match: AWS T-family accrues credits (surplus billed in unlimited mode); OCI bursting above baseline is free but not guaranteed. Sustained-capacity equivalence, not identical behavior.']
+        : []),
       'Cloud price = On-Demand Linux; add Savings Plans/Reserved for committed discounts.',
       'OCI E5 has flat global pricing; the other clouds vary by region (esp. sa-east-1 premium).',
       'Storage and egress not included — use calculate_storage_cost / compare_data_egress.',

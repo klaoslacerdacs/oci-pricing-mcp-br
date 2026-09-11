@@ -42,12 +42,20 @@ export function calculateMonthlyCost(input: CostEstimateInput): CostEstimateResu
         if (shape.minMemoryGB && input.compute.memoryGB < shape.minMemoryGB) input.compute.memoryGB = shape.minMemoryGB;
       }
 
-      // OCPU cost
-      const ocpuCost = shape.ocpuPrice * input.compute.ocpus * hoursPerMonth;
+      // OCPU cost. OCI burstable billing: compute is billed at the baseline fraction
+      // of OCPUs (12.5% or 50%); usage above baseline is billed on actual consumption.
+      // Memory is always billed in full.
+      const burst = input.compute.burstBaseline;
+      const billedComputeOcpus =
+        burst && burst > 0 && burst < 1 ? Math.round(input.compute.ocpus * burst * 1000) / 1000 : input.compute.ocpus;
+      if (billedComputeOcpus !== input.compute.ocpus) {
+        notes.push(`Burstable baseline ${burst}: compute billed at ${billedComputeOcpus} OCPU (memory billed in full; bursting above baseline is free but not guaranteed)`);
+      }
+      const ocpuCost = shape.ocpuPrice * billedComputeOcpus * hoursPerMonth;
       breakdown.push({
         category: 'Compute',
-        item: `${shape.shapeFamily} - OCPUs`,
-        quantity: input.compute.ocpus,
+        item: burst && burst < 1 ? `${shape.shapeFamily} - OCPUs (burstable, baseline ${burst})` : `${shape.shapeFamily} - OCPUs`,
+        quantity: billedComputeOcpus,
         unit: 'OCPU',
         unitPrice: shape.ocpuPrice,
         monthlyTotal: ocpuCost,
