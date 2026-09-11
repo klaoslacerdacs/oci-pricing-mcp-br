@@ -489,10 +489,11 @@
       "type": "postgresql",
       "description": "OCI Database with PostgreSQL - Managed PostgreSQL service",
       "unit": "OCPU per hour",
-      "pricePerUnit": 0.0336,
+      "pricePerUnit": 0.098,
       "currency": "USD",
       "licenseIncluded": true,
-      "notes": "PostgreSQL 14/15/16. High availability option available."
+      "notes": "PostgreSQL 14/15/16. High availability option available. Managed service fee only; total cost also includes underlying E5 compute + memory (see calculate_database_cost).",
+      "storagePrice": 0.072
     },
     {
       "service": "database",
@@ -500,7 +501,7 @@
       "type": "nosql-on-demand",
       "description": "NoSQL Database - On-demand capacity",
       "unit": "request",
-      "pricePerUnit": 0.000001,
+      "pricePerUnit": 1e-06,
       "currency": "USD",
       "licenseIncluded": true,
       "notes": "Pay per read/write unit. First 200M reads free, 50M writes free."
@@ -724,7 +725,7 @@
       "type": "functions-invocations",
       "description": "OCI Functions - Per invocation charge",
       "unit": "invocation",
-      "pricePerUnit": 2e-7,
+      "pricePerUnit": 2e-07,
       "currency": "USD",
       "freePerMonth": 2000000,
       "notes": "First 2 million invocations/month free. $0.20 per million after."
@@ -734,10 +735,10 @@
       "type": "functions-execution",
       "description": "OCI Functions - Execution time (GB-seconds)",
       "unit": "GB-second",
-      "pricePerUnit": 0.00001417,
+      "pricePerUnit": 1.417e-05,
       "currency": "USD",
       "freePerMonth": 400000,
-      "notes": "First 400K GB-seconds/month free. Memory × execution time."
+      "notes": "First 400K GB-seconds/month free. Memory \u00d7 execution time."
     },
     {
       "service": "serverless",

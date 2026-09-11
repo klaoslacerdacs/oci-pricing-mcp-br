@@ -2,7 +2,7 @@
  * OCI Database Pricing Tools
  */
 
-import { getDatabasePricing, getLastUpdated, getFreeTier } from '../data/fetcher.js';
+import { getDatabasePricing, getLastUpdated, getFreeTier, getLiveSkuPrice } from '../data/fetcher.js';
 
 export interface ListDatabaseOptionsParams {
   type?: 'autonomous' | 'mysql' | 'postgresql' | 'nosql' | 'base-db' | 'exadata';
@@ -115,20 +115,50 @@ export interface CalculateDatabaseCostParams {
     | 'base-database-vm';
   computeUnits: number; // ECPUs or OCPUs depending on database type
   storageGB: number;
+  memoryGB?: number; // PostgreSQL only; defaults to computeUnits * 16 (E5 ratio)
   licenseType?: 'included' | 'byol';
   hoursPerMonth?: number; // Default 730 for 24/7
 }
 
-export function calculateDatabaseCost(params: CalculateDatabaseCostParams): {
+export async function calculateDatabaseCost(params: CalculateDatabaseCostParams): Promise<{
   breakdown: Array<{ item: string; quantity: number; unit: string; unitPrice: number; monthlyTotal: number }>;
   totalMonthly: number;
   savings?: { byolSavings: number; percentSaved: number };
   notes: string[];
-} {
+}> {
   const databases = getDatabasePricing();
   const breakdown: Array<{ item: string; quantity: number; unit: string; unitPrice: number; monthlyTotal: number }> = [];
   const notes: string[] = [];
   const hoursPerMonth = params.hoursPerMonth || 730;
+
+  // OCI Managed PostgreSQL bills as 4 SKUs, not one: the managed service fee
+  // PLUS the underlying E5 compute (OCPU + memory) PLUS optimized storage.
+  // Prices pulled live per part number (bundled snapshot as fallback).
+  if (params.type === 'postgresql') {
+    const round = (n: number) => Math.round(n * 100) / 100;
+    const memoryGB = params.memoryGB ?? params.computeUnits * 16;
+    const [pg, e5Ocpu, e5Mem, stor] = await Promise.all([
+      getLiveSkuPrice('B99060'), // Database with PostgreSQL - X86 (OCPU/hr)
+      getLiveSkuPrice('B97384'), // Compute - Standard - E5 - OCPU
+      getLiveSkuPrice('B97385'), // Compute - Standard - E5 - Memory (GB/hr)
+      getLiveSkuPrice('B99062'), // Database Optimized Storage (GB/month)
+    ]);
+    const rows: Array<[string, number, string, number | null, number]> = [
+      ['Database with PostgreSQL - X86 (managed)', params.computeUnits, 'OCPU', pg, (pg ?? 0) * params.computeUnits * hoursPerMonth],
+      ['Compute - Standard - E5 - OCPU', params.computeUnits, 'OCPU', e5Ocpu, (e5Ocpu ?? 0) * params.computeUnits * hoursPerMonth],
+      ['Compute - Standard - E5 - Memory', memoryGB, 'GB', e5Mem, (e5Mem ?? 0) * memoryGB * hoursPerMonth],
+      ['Database Optimized Storage', params.storageGB, 'GB', stor, (stor ?? 0) * params.storageGB],
+    ];
+    for (const [item, quantity, unit, unitPrice, monthlyTotal] of rows) {
+      breakdown.push({ item, quantity, unit, unitPrice: unitPrice ?? 0, monthlyTotal: round(monthlyTotal) });
+    }
+    if ([pg, e5Ocpu, e5Mem, stor].some((p) => p === null)) {
+      notes.push('One or more SKU prices unavailable (live + bundled) and counted as $0');
+    }
+    notes.push(`Memory defaulted to ${memoryGB} GB (E5 ~16 GB/OCPU); pass memoryGB to override`);
+    if (hoursPerMonth < 730) notes.push(`Calculated for ${hoursPerMonth} hours/month (not 24/7 usage)`);
+    return { breakdown, totalMonthly: round(breakdown.reduce((s, b) => s + b.monthlyTotal, 0)), notes };
+  }
 
   // Find the database pricing
   const licenseFilter = params.licenseType === 'byol' ? '-byol' : '';

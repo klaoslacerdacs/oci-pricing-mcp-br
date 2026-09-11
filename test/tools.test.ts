@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { calculateNetworkingCost, compareDataEgress } from '../src/tools/networking.js';
 import { listComputeShapes } from '../src/tools/compute.js';
+import { calculateDatabaseCost } from '../src/tools/database.js';
 import {
   listServicesByCategory,
   listAIMLServices,
@@ -73,5 +74,25 @@ describe('list_services_by_category consolidation', () => {
   it('throws a helpful error on an unknown category', () => {
     // @ts-expect-error intentionally invalid category
     expect(() => listServicesByCategory({ category: 'nope' })).toThrow(/Unknown service category/);
+  });
+});
+
+describe('calculateDatabaseCost - PostgreSQL 4-SKU model', () => {
+  it('matches Oracle calculator: 1 OCPU / 16 GB / 744h ~= managed+compute+memory', async () => {
+    const r = await calculateDatabaseCost({
+      type: 'postgresql', computeUnits: 1, storageGB: 1, memoryGB: 16, hoursPerMonth: 744,
+    });
+    const by = (s: string) => r.breakdown.find((b) => b.item.includes(s))!.monthlyTotal;
+    expect(by('managed')).toBeCloseTo(72.91, 1);   // B99060 @0.098
+    expect(by('E5 - OCPU')).toBeCloseTo(22.32, 1); // B97384 @0.03
+    expect(by('E5 - Memory')).toBeCloseTo(23.81, 1);// B97385 @0.002
+    expect(r.totalMonthly).toBeGreaterThan(119);    // vs old broken ~$25
+    expect(r.breakdown).toHaveLength(4);
+  });
+
+  it('defaults memory to computeUnits*16 when omitted', async () => {
+    const r = await calculateDatabaseCost({ type: 'postgresql', computeUnits: 2, storageGB: 0 });
+    const mem = r.breakdown.find((b) => b.item.includes('Memory'))!;
+    expect(mem.quantity).toBe(32);
   });
 });

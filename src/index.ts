@@ -318,6 +318,7 @@ const TOOLS = [
         },
         computeUnits: { type: 'number', description: 'ECPUs or OCPUs' },
         storageGB: { type: 'number' },
+        memoryGB: { type: 'number', description: 'PostgreSQL only; RAM in GB (default computeUnits*16)' },
         licenseType: { type: 'string', enum: ['included', 'byol'] },
         hoursPerMonth: { type: 'number' },
       },
@@ -885,7 +886,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         result = listDatabaseOptions(typedArgs);
         break;
       case 'calculate_database_cost':
-        result = calculateDatabaseCost(typedArgs);
+        result = await calculateDatabaseCost(typedArgs);
         break;
       case 'compare_database_options':
         result = compareDatabaseOptions(typedArgs.workloadType);
