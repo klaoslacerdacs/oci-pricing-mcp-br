@@ -466,11 +466,14 @@
       "databaseType": "mysql-heatwave",
       "type": "mysql-heatwave",
       "description": "MySQL HeatWave - MySQL with in-memory analytics acceleration",
-      "unit": "OCPU per hour",
-      "pricePerUnit": 0.0336,
+      "unit": "ECPU per hour",
+      "pricePerUnit": 0.0366,
       "currency": "USD",
       "licenseIncluded": true,
-      "notes": "MySQL 8.0 compatible. HeatWave for real-time analytics."
+      "notes": "MySQL 8.0 compatible. Billed per ECPU (B108030 $0.0366/hr); storage B92426 $0.04/GB/mo. Minimum 2 ECPU + 50 GB (~$56.46/mo at 744h). HeatWave cluster nodes billed separately.",
+      "ecpuPrice": 0.0366,
+      "storagePrice": 0.04,
+      "partNumber": "B108030"
     },
     {
       "service": "database",
@@ -478,10 +481,11 @@
       "type": "mysql-heatwave-storage",
       "description": "MySQL HeatWave - Storage",
       "unit": "GB per month",
-      "pricePerUnit": 0.034,
+      "pricePerUnit": 0.04,
       "currency": "USD",
       "licenseIncluded": true,
-      "notes": "Block storage for MySQL data. 50 GB minimum."
+      "notes": "Block storage for MySQL data. 50 GB minimum.",
+      "partNumber": "B92426"
     },
     {
       "service": "database",

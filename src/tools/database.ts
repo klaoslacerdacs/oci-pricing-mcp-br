@@ -195,11 +195,22 @@ export async function calculateDatabaseCost(params: CalculateDatabaseCostParams)
   const ecpuPrice = (db as { ecpuPrice?: number }).ecpuPrice;
   const computePrice = ecpuPrice || db.pricePerUnit;
   const computeUnit = ecpuPrice ? 'ECPU' : 'OCPU';
-  // Autonomous floor: 2 ECPUs minimum — smaller configs cannot be provisioned.
+  // Provisioning floors: Autonomous and MySQL both start at 2 ECPUs; MySQL storage starts at 50 GB.
   let computeUnits = params.computeUnits;
   if (params.type.startsWith('autonomous') && computeUnits < 2) {
     computeUnits = 2;
     notes.push(`Autonomous minimum is 2 ECPUs; clamped from ${params.computeUnits} (e.g. 2-ECPU ATP + 20 GB ≈ $506/mo at 744h)`);
+  }
+  let storageGB = params.storageGB;
+  if (params.type === 'mysql-heatwave') {
+    if (computeUnits < 2) {
+      computeUnits = 2;
+      notes.push(`MySQL minimum is 2 ECPUs; clamped from ${params.computeUnits}`);
+    }
+    if (storageGB < 50) {
+      storageGB = 50;
+      notes.push(`MySQL minimum storage is 50 GB; clamped from ${params.storageGB} (floor: 2 ECPU + 50 GB ≈ $56.46/mo at 744h)`);
+    }
   }
   const computeCost = computePrice * computeUnits * hoursPerMonth;
 
@@ -213,11 +224,11 @@ export async function calculateDatabaseCost(params: CalculateDatabaseCostParams)
 
   // Storage cost
   const storagePrice = (db as { storagePrice?: number }).storagePrice || 0.0255;
-  const storageCost = storagePrice * params.storageGB;
+  const storageCost = storagePrice * storageGB;
 
   breakdown.push({
     item: `${db.description} - Storage`,
-    quantity: params.storageGB,
+    quantity: storageGB,
     unit: 'GB',
     unitPrice: storagePrice,
     monthlyTotal: Math.round(storageCost * 100) / 100,
