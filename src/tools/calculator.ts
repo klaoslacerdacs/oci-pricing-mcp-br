@@ -35,6 +35,13 @@ export function calculateMonthlyCost(input: CostEstimateInput): CostEstimateResu
     if (shape) {
       const hoursPerMonth = input.compute.hoursPerMonth || HOURS_PER_MONTH;
 
+      // Shape hardware floor (Oracle estimator shapes.json): e.g. DenseIO flex min 8 OCPU/128 GB.
+      if (shape.minOCPU && input.compute.ocpus < shape.minOCPU) {
+        notes.push(`${shape.shapeFamily} minimum is ${shape.minOCPU} OCPU${shape.minMemoryGB ? ` / ${shape.minMemoryGB} GB` : ''}; requested ${input.compute.ocpus} OCPU cannot be provisioned — clamped`);
+        input.compute.ocpus = shape.minOCPU;
+        if (shape.minMemoryGB && input.compute.memoryGB < shape.minMemoryGB) input.compute.memoryGB = shape.minMemoryGB;
+      }
+
       // OCPU cost
       const ocpuCost = shape.ocpuPrice * input.compute.ocpus * hoursPerMonth;
       breakdown.push({
