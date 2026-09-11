@@ -341,7 +341,7 @@ async function loadBalancer(region: keyof typeof REGIONS, sizing: Sizing): Promi
   const azure = await safe('Azure', 'Load Balancer', 'prices.azure.com', async () => {
     // Azure LB Standard meters are region 'Global' — query without a region filter.
     const r = (await getAzurePrice({ query: 'Load Balancer', top: 100 })) as { items?: Array<{ meter: string; price: number; unit: string }> };
-    const rows = (r.items || []).filter((x) => /Hour/i.test(x.unit) && x.price > 0).sort((a, b) => a.price - b.price);
+    const rows = (r.items || []).filter((x) => /Hour/i.test(x.unit) && x.price > 0 && /Included LB Rules/i.test(x.meter)).sort((a, b) => a.price - b.price);
     if (!rows.length) throw new Error('Azure Load Balancer rate not found');
     return { components: [{ item: rows[0].meter, price: rows[0].price, unit: 'hour' }], monthlyEstimate: round(rows[0].price * HOURS), note: 'base rule only — data + extra rules billed separately' };
   });
