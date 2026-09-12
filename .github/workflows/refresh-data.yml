@@ -3,9 +3,11 @@ name: Refresh pricing data
 # Re-fetches Oracle's live pricing API and refreshes the raw-product snapshot +
 # metadata timestamps in src/data/pricing-data.json (curated category structures
 # are preserved). Opens a PR when anything changed.
+#
+# Schedule desativado: o refresh de produção é o cron NO HOST (deploy/redeploy.sh
+# rebuilda a imagem, que roda `npm run generate-data` no build). Este workflow
+# fica só como disparo manual pra atualizar o snapshot commitado (fallback).
 on:
-  schedule:
-    - cron: '23 7 1 * *' # 07:23 UTC on the 1st of every month
   workflow_dispatch:
 
 jobs:
