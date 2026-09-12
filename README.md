@@ -76,7 +76,34 @@ making it significantly more cost-effective for data-heavy workloads.
 
 ## Installation
 
-### Quick Install (Recommended)
+### Hosted (remote — no local install)
+
+A hosted instance runs over Streamable HTTP, so any MCP client connects by URL — no npx, no local Node.
+
+**Endpoint:** `https://mcpfin.nimbusnetwork.dev/mcp`
+
+Claude Code:
+
+```bash
+claude mcp add oci-pricing --transport http https://mcpfin.nimbusnetwork.dev/mcp
+```
+
+Claude Desktop / clients that only speak stdio — bridge with `mcp-remote`:
+
+```json
+{
+  "mcpServers": {
+    "oci-pricing": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcpfin.nimbusnetwork.dev/mcp"]
+    }
+  }
+}
+```
+
+> Self-hosting the remote endpoint: see [Self-hosting (Docker)](#self-hosting-docker).
+
+### Quick Install (Recommended, local)
 
 Runs straight from this GitHub repo (the `prepare` script builds it on install):
 
@@ -108,6 +135,41 @@ npm install
 npm run build
 claude mcp add oci-pricing -- node /path/to/oci-pricing-mcp-br/dist/index.js
 ```
+
+### Self-hosting (Docker)
+
+The server speaks stdio; [`supergateway`](https://github.com/supercorp-ai/supergateway) bridges it to Streamable HTTP so it can run behind a reverse proxy or tunnel. Fixed port **8080**.
+
+`Dockerfile`:
+
+```dockerfile
+FROM node:22-slim
+RUN apt-get update && apt-get install -y --no-install-recommends git ca-certificates && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+RUN git clone --depth 1 https://github.com/klaoslacerdacs/oci-pricing-mcp-br.git . && npm ci && npm run build
+RUN npm install -g supergateway
+EXPOSE 8080
+CMD supergateway --stdio "node dist/index.js" --outputTransport streamableHttp --port 8080 --streamableHttpPath /mcp --stateful --healthEndpoint /healthz
+```
+
+`docker-compose.yml`:
+
+```yaml
+services:
+  mcp:
+    build: .
+    container_name: mcpfin
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+```
+
+```bash
+docker compose up -d --build          # deploy
+curl -s localhost:8080/healthz        # -> ok
+```
+
+Point a tunnel/reverse proxy (Cloudflare Tunnel, nginx, Caddy…) at `localhost:8080`, then connect clients to `https://<your-host>/mcp`. The endpoint is unauthenticated — put Cloudflare Access or a proxy auth layer in front if exposing publicly.
 
 ## Available Tools
 
