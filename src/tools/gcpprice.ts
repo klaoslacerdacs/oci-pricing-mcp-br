@@ -64,7 +64,7 @@ async function resolveServiceId(service: string): Promise<WorkerService | null> 
     if (!services) {
       const d = await getJson<{ items?: WorkerService[]; services?: WorkerService[] } | WorkerService[]>('/services');
       services = Array.isArray(d) ? d : d.items || d.services || [];
-      pricingCache.set(cacheKey, services, 1440); // 24h — catalog is stable
+      pricingCache.set(cacheKey, services, 43200); // 30d — catalog rarely changes; refresh via monthly host rebuild
     }
   }
   const q = service.toLowerCase();
@@ -125,7 +125,7 @@ export async function getGcpPrice(params: GetGcpPriceParams = {}) {
     let d = pricingCache.get<{ items?: WorkerSku[]; nextPageToken?: string }>(url);
     if (!d) {
       d = await getJson<{ items?: WorkerSku[]; nextPageToken?: string }>(url);
-      pricingCache.set(url, d, 1440); // 24h — SKU pages are stable between refreshes
+      pricingCache.set(url, d, 43200); // 30d — SKU pages rarely change; refresh via monthly host rebuild
     }
     for (const s of d.items || []) if (inRegion(s)) matched.push(s);
     token = d.nextPageToken || undefined;

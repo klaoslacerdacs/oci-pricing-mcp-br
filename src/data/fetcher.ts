@@ -83,8 +83,8 @@ export function getPricingData(): OCIPricingData {
   // Load bundled data
   const data = loadBundledPricingData();
 
-  // Cache for 24 hours (bundled data doesn't change frequently)
-  pricingCache.set(CACHE_KEYS.PRICING_DATA, data, 60 * 24);
+  // Cache 30 days — bundled data only changes on the monthly host rebuild
+  pricingCache.set(CACHE_KEYS.PRICING_DATA, data, 60 * 24 * 30);
 
   return data;
 }
