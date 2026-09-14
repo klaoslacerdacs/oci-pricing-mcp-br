@@ -4,9 +4,27 @@
  * BigQuery, Cloud SQL, etc. Worker base overridable via env GCP_PRICE_URL.
  */
 
+import { readFileSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 import { pricingCache } from '../data/cache.js';
 
 const BASE = (process.env.GCP_PRICE_URL || 'https://mcp-price-cf.nns.workers.dev').replace(/\/$/, '');
+
+// Bundled GCP service catalog (refreshed at build time by generate-pricing-data).
+// Reading it locally avoids the ~14s live /services fetch on every name lookup.
+const GCP_SERVICES_PATH = join(dirname(fileURLToPath(import.meta.url)), '../data/gcp-services.json');
+let bundledServices: WorkerService[] | null = null;
+function getBundledServices(): WorkerService[] | null {
+  if (bundledServices) return bundledServices;
+  try {
+    const d = JSON.parse(readFileSync(GCP_SERVICES_PATH, 'utf8')) as { services: WorkerService[] };
+    if (Array.isArray(d.services) && d.services.length) return (bundledServices = d.services);
+  } catch {
+    /* no snapshot yet — fall back to live */
+  }
+  return null;
+}
 
 export interface GetGcpPriceParams {
   service?: string; // GCP serviceId (e.g. "9662-B51E-5089") or displayName substring (e.g. "Cloud SQL")
@@ -39,12 +57,15 @@ const looksLikeId = (s: string) => /^[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}$/i.test
 
 async function resolveServiceId(service: string): Promise<WorkerService | null> {
   if (looksLikeId(service)) return { serviceId: service.toUpperCase(), displayName: service };
-  const cacheKey = 'gcpworker_services';
-  let services = pricingCache.get<WorkerService[]>(cacheKey);
+  let services = getBundledServices();
   if (!services) {
-    const d = await getJson<{ items?: WorkerService[]; services?: WorkerService[] } | WorkerService[]>('/services');
-    services = Array.isArray(d) ? d : d.items || d.services || [];
-    pricingCache.set(cacheKey, services, 1440); // 24h — catalog is stable
+    const cacheKey = 'gcpworker_services';
+    services = pricingCache.get<WorkerService[]>(cacheKey);
+    if (!services) {
+      const d = await getJson<{ items?: WorkerService[]; services?: WorkerService[] } | WorkerService[]>('/services');
+      services = Array.isArray(d) ? d : d.items || d.services || [];
+      pricingCache.set(cacheKey, services, 1440); // 24h — catalog is stable
+    }
   }
   const q = service.toLowerCase();
   // Prefer an exact displayName, else the shortest substring match (avoids "BigQuery BI Engine" when asked "BigQuery").
@@ -55,13 +76,25 @@ async function resolveServiceId(service: string): Promise<WorkerService | null> 
 }
 
 export async function getGcpPrice(params: GetGcpPriceParams = {}) {
-  // No service -> list services (optionally filtered).
+  // No service -> list services (optionally filtered). Serve from the bundled
+  // snapshot when present (instant); fall back to the live proxy otherwise.
   if (!params.service) {
-    const d = await getJson<{ items?: WorkerService[]; services?: WorkerService[] } | WorkerService[]>(
-      `/services${params.query ? `?q=${encodeURIComponent(params.query)}` : ''}`
-    );
-    const services = (Array.isArray(d) ? d : d.items || d.services || []).map((s) => ({ serviceId: s.serviceId, displayName: s.displayName }));
-    return { provider: 'GCP', source: 'Cloud Billing Catalog (live proxy)', usage: 'Pass service (name or serviceId) to get its SKUs.', count: services.length, services };
+    const bundled = getBundledServices();
+    let list: WorkerService[];
+    let source: string;
+    if (bundled) {
+      const q = params.query?.toLowerCase();
+      list = q ? bundled.filter((s) => s.displayName.toLowerCase().includes(q)) : bundled;
+      source = 'Cloud Billing Catalog (bundled snapshot)';
+    } else {
+      const d = await getJson<{ items?: WorkerService[]; services?: WorkerService[] } | WorkerService[]>(
+        `/services${params.query ? `?q=${encodeURIComponent(params.query)}` : ''}`
+      );
+      list = Array.isArray(d) ? d : d.items || d.services || [];
+      source = 'Cloud Billing Catalog (live proxy)';
+    }
+    const services = list.map((s) => ({ serviceId: s.serviceId, displayName: s.displayName }));
+    return { provider: 'GCP', source, usage: 'Pass service (name or serviceId) to get its SKUs.', count: services.length, services };
   }
 
   const svc = await resolveServiceId(params.service);
@@ -88,7 +121,12 @@ export async function getGcpPrice(params: GetGcpPriceParams = {}) {
   let pages = 0;
   let nextPageToken: string | null = null;
   do {
-    const d: { items?: WorkerSku[]; nextPageToken?: string } = await getJson(buildUrl(token));
+    const url = buildUrl(token);
+    let d = pricingCache.get<{ items?: WorkerSku[]; nextPageToken?: string }>(url);
+    if (!d) {
+      d = await getJson<{ items?: WorkerSku[]; nextPageToken?: string }>(url);
+      pricingCache.set(url, d, 1440); // 24h — SKU pages are stable between refreshes
+    }
     for (const s of d.items || []) if (inRegion(s)) matched.push(s);
     token = d.nextPageToken || undefined;
     nextPageToken = d.nextPageToken || null;

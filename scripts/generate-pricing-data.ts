@@ -20,6 +20,8 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OCI_PRICING_API = 'https://apexapps.oracle.com/pls/apex/cetools/api/v1/products/';
 const DATA_PATH = join(__dirname, '../src/data/pricing-data.json');
+const GCP_PROXY = (process.env.GCP_PRICE_URL || 'https://mcp-price-cf.nns.workers.dev').replace(/\/$/, '');
+const GCP_SERVICES_PATH = join(__dirname, '../src/data/gcp-services.json');
 
 interface ApiItem {
   partNumber: string;
@@ -92,6 +94,27 @@ async function main(): Promise<void> {
   console.log(`  Raw products:      ${prevCount} -> ${products.length}`);
   console.log(`  Service categories: ${totalCategories}`);
   console.log('  Curated category structures were preserved unchanged.');
+
+  await refreshGcpServices();
+}
+
+// The GCP /services list (~1778 entries, ~146 KB) is the slow part of every
+// name-based GCP query (~14s live). Snapshot it to disk so resolveServiceId is
+// instant. Best-effort: a proxy hiccup keeps the previous snapshot, never fails
+// the OCI refresh above.
+async function refreshGcpServices(): Promise<void> {
+  try {
+    console.log(`Fetching GCP service catalog from ${GCP_PROXY}/services ...`);
+    const res = await fetch(`${GCP_PROXY}/services`, { signal: AbortSignal.timeout(30000) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const d = (await res.json()) as { items?: unknown[]; services?: unknown[] } | unknown[];
+    const services = (Array.isArray(d) ? d : d.items || d.services || []) as Array<{ serviceId: string; displayName: string }>;
+    if (services.length < 100) throw new Error(`only ${services.length} services — refusing to overwrite snapshot`);
+    writeFileSync(GCP_SERVICES_PATH, JSON.stringify({ generatedAt: new Date().toISOString(), services }, null, 2) + '\n');
+    console.log(`  GCP services snapshot: ${services.length} entries`);
+  } catch (err) {
+    console.warn(`  WARN: GCP services snapshot skipped (${(err as Error).message}); keeping existing file.`);
+  }
 }
 
 main().catch((err) => {
