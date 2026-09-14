@@ -8,8 +8,15 @@ services:
     restart: unless-stopped
     ports:
       - "8080:8080"
+    environment:
+      GCP_CACHE_DIR: /data/gcp-cache
+    volumes:
+      - gcp-cache:/data/gcp-cache   # sobrevive ao rebuild mensal; TTL 30d expira sozinho
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:8080/healthz',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
       interval: 30s
       timeout: 5s
       retries: 3
+
+volumes:
+  gcp-cache:

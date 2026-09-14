@@ -4,12 +4,38 @@
  * BigQuery, Cloud SQL, etc. Worker base overridable via env GCP_PRICE_URL.
  */
 
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync, mkdirSync } from 'fs';
+import { createHash } from 'crypto';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { pricingCache } from '../data/cache.js';
 
 const BASE = (process.env.GCP_PRICE_URL || 'https://mcp-price-cf.nns.workers.dev').replace(/\/$/, '');
+const SKU_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30d — SKU prices rarely change
+
+// Disk-backed SKU-page cache on a mounted volume (GCP_CACHE_DIR) so it survives
+// the monthly container rebuild — memory alone would go cold on every deploy.
+// Read-through: memory (pricingCache) -> disk -> live proxy.
+const CACHE_DIR = process.env.GCP_CACHE_DIR || '/app/.gcp-cache';
+const skuFile = (url: string) => join(CACHE_DIR, createHash('sha1').update(url).digest('hex') + '.json');
+
+export function diskGet<T>(url: string): T | null {
+  try {
+    const e = JSON.parse(readFileSync(skuFile(url), 'utf8')) as { expiresAt: number; data: T };
+    if (Date.now() < e.expiresAt) return e.data;
+  } catch {
+    /* miss or unreadable */
+  }
+  return null;
+}
+export function diskSet<T>(url: string, data: T): void {
+  try {
+    mkdirSync(CACHE_DIR, { recursive: true });
+    writeFileSync(skuFile(url), JSON.stringify({ expiresAt: Date.now() + SKU_TTL_MS, data }));
+  } catch {
+    /* volume not writable — memory cache still covers the session */
+  }
+}
 
 // Bundled GCP service catalog (refreshed at build time by generate-pricing-data).
 // Reading it locally avoids the ~14s live /services fetch on every name lookup.
@@ -122,10 +148,12 @@ export async function getGcpPrice(params: GetGcpPriceParams = {}) {
   let nextPageToken: string | null = null;
   do {
     const url = buildUrl(token);
-    let d = pricingCache.get<{ items?: WorkerSku[]; nextPageToken?: string }>(url);
+    type Page = { items?: WorkerSku[]; nextPageToken?: string };
+    let d = pricingCache.get<Page>(url) || diskGet<Page>(url);
     if (!d) {
-      d = await getJson<{ items?: WorkerSku[]; nextPageToken?: string }>(url);
-      pricingCache.set(url, d, 43200); // 30d — SKU pages rarely change; refresh via monthly host rebuild
+      d = await getJson<Page>(url);
+      pricingCache.set(url, d, 43200); // 30d in memory
+      diskSet(url, d); // 30d on the persistent volume
     }
     for (const s of d.items || []) if (inRegion(s)) matched.push(s);
     token = d.nextPageToken || undefined;
