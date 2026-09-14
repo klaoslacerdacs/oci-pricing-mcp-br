@@ -146,11 +146,13 @@ export async function getGcpPrice(params: GetGcpPriceParams = {}) {
   let token = params.pageToken;
   let pages = 0;
   let nextPageToken: string | null = null;
+  let hitLive = false;
   do {
     const url = buildUrl(token);
     type Page = { items?: WorkerSku[]; nextPageToken?: string };
     let d = pricingCache.get<Page>(url) || diskGet<Page>(url);
     if (!d) {
+      hitLive = true;
       d = await getJson<Page>(url);
       pricingCache.set(url, d, 43200); // 30d in memory
       diskSet(url, d); // 30d on the persistent volume
@@ -164,7 +166,7 @@ export async function getGcpPrice(params: GetGcpPriceParams = {}) {
   const items = matched.slice(0, 100);
   return {
     provider: 'GCP',
-    source: 'Cloud Billing Catalog (live proxy)',
+    source: hitLive ? 'Cloud Billing Catalog (live proxy)' : 'Cloud Billing Catalog (cache, 30d)',
     service: svc.displayName,
     serviceId: svc.serviceId,
     filters: { query: params.query || null, region: params.region || null, usageType: params.usageType || null },
